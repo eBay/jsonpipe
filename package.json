@@ -1,0 +1,23 @@
+{
+  "name": "jsonpipe",
+  "version": "0.0.1",
+  "description": "AJAX utility for consuming chunked JSON responses",
+  "main": "./lib/jsonpipe.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:eBay/jsonpipe.git"
+  },
+  "author": "Senthil Padmanabhan <https://twitter.com/senthil_hi>",
+  "license": "MIT",
+  "devDependencies": {
+    "sinon": "~1.12.2",
+    "chai": "~1.10.0",
+    "mocha": "~2.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}
