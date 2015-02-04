@@ -1,11 +1,26 @@
 /*global describe, it, before*/
 'use strict';
 
-var assert = require('chai').assert,
-	sinon = require('sinon'),
-	jsonpipe = require('../lib/jsonpipe'),
-	testUrl = 'https://github.com/eBay/jsonpipe'; // this is a dummy URL, the actual response will be simulated by sinon
+// A require to work on node or browser
+function smartRequire(name, windowName) {
+	var stripName = function(name) {
+		if(!name) {
+			return;
+		}
+		var strippedName = name.match(/\/([^\/]+)$/);
+		return strippedName? strippedName[1]: name;
+	};
+	if(typeof require === 'function') {
+		return require(name);
+	} else {
+		return window[windowName || stripName(name)];
+	}
+}
 
+var assert = smartRequire('chai').assert,
+	sinon = smartRequire('sinon'),
+	jsonpipe = smartRequire('../lib/jsonpipe'),
+	testUrl = 'https://github.com/eBay/jsonpipe'; // this is a dummy URL, the actual response will be simulated by sinon
 
 //------------------------------------------------------------------------------
 // Tests
