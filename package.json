@@ -13,9 +13,8 @@
   "author": "Senthil Padmanabhan <https://twitter.com/senthil_hi>",
   "license": "MIT",
   "devDependencies": {
-    "sinon": "~1.12.2",
-    "chai": "~1.10.0",
-    "mocha": "~2.1.0"
+    "phantomjs": "~1.9.15",
+    "mocha-phantomjs": "~3.5.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
