@@ -258,7 +258,6 @@ describe('jsonpipe', function() {
 				'\n\n{"id": 0}\n\n{"id": 1}\n\n{"id": 2}\n\n');
 		});		
 
-		// Arrays
 		it('should process a JSON response which has Array chunks', function(done) {
 			var chunkCount = 0,
 				xhr = jsonpipe.flow(testUrl, {
@@ -275,7 +274,87 @@ describe('jsonpipe', function() {
 			xhr.respond(200, headers, 
 				'[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
 		});			
+	});
 
+	describe('vefiry error scenarios', function() {
+
+		var fakexhr,
+			headers = {
+				"Content-Type": "application/json",
+				"Transfer-Encoding": "chunked"
+			};
+
+		before(function() {
+			fakexhr = sinon.useFakeXMLHttpRequest();
+		});
+
+		after(function() {
+			fakexhr.restore();
+		});
+
+		it('should call error function on invalid JSON response', function(done) {
+			var chunkSize = 0,
+				xhr = jsonpipe.flow(testUrl, {
+				"error": function(msg) {
+					assert.equal(msg, 'parsererror');
+					if(++chunkSize === 2) {
+						done();
+					}					
+				}
+			});
+
+			xhr.respond(200, headers, '{"id"\n\n}');
+
+		});
+
+		it('should call success function on valid chunk and error function on invalid JSON chunk', function(done) {
+			var chunkSize = 0,
+				callDone = function() {					
+					if(++chunkSize === 2) {
+						done();
+					}
+				},
+				xhr = jsonpipe.flow(testUrl, {
+				"success": function(data) {
+					assert.equal(data.id, 1);
+					callDone();
+				},	
+				"error": function(msg) {
+					assert.equal(msg, 'parsererror');
+					callDone();
+				}
+			});
+
+			xhr.respond(200, headers, '{"id"}\n\n{"id": 1}');
+
+		});
+
+		it('should call error function if timeout exceeded', function(done) {
+			var xhr = jsonpipe.flow(testUrl, {
+				"error": function() {
+					assert.equal(xhr.status, 0);
+					done();
+				},
+				"timeout": 20
+			});		
+
+			// Set auto response
+			xhr.autoRespond = true;
+			xhr.autoRespondAfter = 50;
+		});	
+
+		it('should call error function on HTTP response code other than 200. e.g. 404', function(done) {
+
+			var xhr = jsonpipe.flow(testUrl, {
+				"error": function(msg) {
+					assert.equal(xhr.status, '404');
+					assert.equal(msg, 'Not Found');
+					done();
+				}
+			});
+
+			xhr.respond(404);
+		});
 	});
 
 });
