@@ -1,4 +1,4 @@
 jsonpipe
 ========
 
-AJAX client for chunked JSON responses 
+jsonpipe is a lightweight AJAX client for chunked JSON responses.
