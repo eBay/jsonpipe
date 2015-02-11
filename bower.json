@@ -15,6 +15,7 @@
 	    ".gitignore",
 	    "*.md",
 	    "*.json",
+	    "gulpfile.js",
 	    "**/*.txt"		
 	]
 }
