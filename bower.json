@@ -1,0 +1,20 @@
+{
+	"name": "jsonpipe",
+	"version": "0.0.1",
+	"main": "jsonpipe.js",
+	"keywords": [
+		"jsonpipe",
+		"ajax",
+		"json chunks",
+		"bigpipe"
+	],
+	"ignore": [
+	    "**/.*",
+	    "lib",
+	    "test",
+	    ".gitignore",
+	    "*.md",
+	    "*.json",
+	    "**/*.txt"		
+	]
+}
