@@ -14,7 +14,9 @@
   "license": "MIT",
   "devDependencies": {
     "phantomjs": "~1.9.15",
-    "mocha-phantomjs": "~3.5.3"
+    "mocha-phantomjs": "~3.5.3",
+    "gulp": "~3.8.11",
+    "gulp-browserify": "~0.5.1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
