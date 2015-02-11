@@ -4,7 +4,7 @@
   "description": "AJAX utility for consuming chunked JSON responses",
   "main": "./lib/jsonpipe.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -13,10 +13,9 @@
   "author": "Senthil Padmanabhan <https://twitter.com/senthil_hi>",
   "license": "MIT",
   "devDependencies": {
-    "phantomjs": "~1.9.15",
-    "mocha-phantomjs": "~3.5.3",
     "gulp": "~3.8.11",
-    "gulp-browserify": "~0.5.1"
+    "gulp-browserify": "~0.5.1",
+    "gulp-mocha-phantomjs": "~0.5.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
