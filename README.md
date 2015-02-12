@@ -6,7 +6,20 @@ jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is sim
 To use jsonpipe, the server response should 
 
 1. Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
-2. The JSON reponses should be separated by the delimiter `\n\n` - double new line characters.   
+2. The JSON reponses should be separated by the delimiter `\n\n` (double new line character). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is that even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
+```JSON
+{
+    "id": 12345,
+    "title": "Bruce Wayne",
+    "price": "$199.99"
+}
+\n\n
+{
+    "id": 67890,
+    "title": "Bane",
+    "price": "$299.99"
+}
+```
 
 ##Usage
 
