@@ -86,7 +86,7 @@ describe('jsonpipe', function() {
 		});								
 		it('should check if request headers are set right', function() {
 			var xhr = jsonpipe.flow(testUrl, {
-				"success": function() {					
+				"success": function() {
 				},
 				"headers": {
 					"x-test": "jsonpipe"
@@ -273,7 +273,25 @@ describe('jsonpipe', function() {
 			xhr.chunkSize = 5;
 			xhr.respond(200, headers, 
 				'[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
-		});			
+		});
+
+		it('should process a multi chunk JSON response separated with the provided option delimiter', function(done) {
+			var chunkCount = 0,
+				xhr = jsonpipe.flow(testUrl, {
+				"delimiter": "\r\r",
+				"success": function(data) {
+					assert.equal(data.id, chunkCount++);
+					if(chunkCount === 3) {
+						done();
+					}					
+				}			
+			});		
+
+			// reduce the chunkSize
+			xhr.chunkSize = 5;
+			xhr.respond(200, headers, 
+				'\r\r{"id": 0}\r\r{"id": 1}\r\r{"id": 2}\r\r');
+		});						
 	});
 
 	describe('vefiry error scenarios', function() {
