@@ -12,7 +12,7 @@ install the package `$ npm install` and run
 Have a bug or a feature request? [Please open a new issue](https://github.com/eBay/jsonpipe/issues)
 
 ##Authors
-**Senthil Padmanabhan** - [github](https://github.com/senthilp) | [twitter](https://twitter.com/senthil_hi)
+[Senthil Padmanabhan](http://senthilp.com/) - [github](https://github.com/senthilp) | [twitter](https://twitter.com/senthil_hi)
 
 ##License 
 Copyright (c) 2015 eBay Inc.
