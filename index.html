@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="jsonpipe : An AJAX client for chunked JSON responses">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>jsonpipe</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/eBay/jsonpipe">View on GitHub</a>
+
+          <h1 id="project_title">jsonpipe</h1>
+          <h2 id="project_tagline">An AJAX client for chunked JSON responses</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/eBay/jsonpipe/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/eBay/jsonpipe/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is similar to <a href="http://api.jquery.com/jquery.ajax/">jQuery ajax</a>, but for JSON reposnses trasmitted through <a href="http://en.wikipedia.org/wiki/Chunked_transfer_encoding">chunked encoding</a>. It is a standalone utility with no dependencies. </p>
+
+<h2>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
+
+<p>To use jsonpipe, the server should </p>
+
+<ol>
+<li>Emit the <a href="http://en.wikipedia.org/wiki/Chunked_transfer_encoding">Transfer-Encoding: chunked</a> HTTP header</li>
+<li>Every valid JSON object should be separated by the delimiter <code>\n\n</code> (double new line character, it is also configurable). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below </li>
+</ol>
+
+<div class="highlight highlight-JSON"><pre>    {
+        <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-c1">12345</span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Bruce Wayne<span class="pl-pds">"</span></span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>$199.99<span class="pl-pds">"</span></span>
+    }
+    \n\n
+    {
+        <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: <span class="pl-c1">67890</span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>Bane<span class="pl-pds">"</span></span>,
+        <span class="pl-s1"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>$299.99<span class="pl-pds">"</span></span>
+    }</pre></div>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p><a href="https://github.com/eBay/jsonpipe/blob/master/jsonpipe.js">jsonpipe.js</a> is bundled as a <a href="http://dontkry.com/posts/code/browserify-and-the-universal-module-definition.html">browserify CommonJS</a> module, so it can be used in the same node.js <code>require</code> style. It has only one API named <code>flow</code> exposed </p>
+
+<div class="highlight highlight-JavaScript"><pre>    <span class="pl-s">var</span> jsonpipe <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>jsonpipe<span class="pl-pds">'</span></span>);
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * @param {String} url A string containing the URL to which the request is sent.</span>
+<span class="pl-c">     * @param {Object} url A set of key/value pairs that configure the Ajax request.</span>
+<span class="pl-c">     * @return {XMLHttpRequest} The XMLHttpRequest object for this request.</span>
+<span class="pl-c">     * @method flow</span>
+<span class="pl-c">     */</span>
+    jsonpipe.flow(<span class="pl-s1"><span class="pl-pds">'</span>http://api.com/items?q=batman<span class="pl-pds">'</span></span>, {
+        <span class="pl-s1"><span class="pl-pds">"</span>delimiter<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>, <span class="pl-c">// String. The delimiter separating valid JSON objects; default is "\n\n"</span>
+        <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-en">success</span><span class="pl-pds">"</span></span>: <span class="pl-st">function</span>(<span class="pl-vpf">data</span>) {
+            <span class="pl-c">// Do something with this JSON chunk</span>
+        },
+        <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-en">error</span><span class="pl-pds">"</span></span>: <span class="pl-st">function</span>(<span class="pl-vpf">errorMsg</span>) {
+            <span class="pl-c">// Something wrong happened, check the error message</span>
+        },
+        <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-en">complete</span><span class="pl-pds">"</span></span>: <span class="pl-st">function</span>(<span class="pl-vpf">statusText</span>) {
+            <span class="pl-c">// Called after success/error, with the XHR status text</span>
+        },
+        <span class="pl-s1"><span class="pl-pds">"</span>timeout<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">3000</span>, <span class="pl-c">// Number. Set a timeout (in milliseconds) for the request</span>
+        <span class="pl-s1"><span class="pl-pds">"</span>method<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>GET<span class="pl-pds">"</span></span>, <span class="pl-c">// String. The type of request to make (e.g. "POST", "GET", "PUT"); default is "GET"</span>
+        <span class="pl-s1"><span class="pl-pds">"</span>headers<span class="pl-pds">"</span></span><span class="pl-k">:</span> { <span class="pl-c">// Object. An object of additional header key/value pairs to send along with request</span>
+            <span class="pl-s1"><span class="pl-pds">"</span>X-Requested-With<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>XMLHttpRequest<span class="pl-pds">"</span></span>
+        },
+        <span class="pl-s1"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span> <span class="pl-c">// String. A serialized string to be sent in a POST/PUT request</span>
+    });</pre></div>
+
+<h3>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a>options</h3>
+
+<h4>
+<a id="delimiter" class="anchor" href="#delimiter" aria-hidden="true"><span class="octicon octicon-link"></span></a>delimiter</h4>
+
+<p>Type: <code>String</code></p>
+
+<p>The delimiter separating valid JSON objects in the chunked response; default is <code>\n\n</code></p>
+
+<h4>
+<a id="success" class="anchor" href="#success" aria-hidden="true"><span class="octicon octicon-link"></span></a>success</h4>
+
+<p>Type: <code>Function</code></p>
+
+<p>The callback function to be called on every valid JSON chunk. The function gets passed the parsed JSON object. </p>
+
+<h4>
+<a id="error" class="anchor" href="#error" aria-hidden="true"><span class="octicon octicon-link"></span></a>error</h4>
+
+<p>Type: <code>Function</code></p>
+
+<p>The callback function to be called on error scenarios. The function gets passed with an error message, reasoning the failure. There can be many reasons for errors, the most common one being the JSON parse error. It that case the error message would be <code>parsererror</code>. For errors associated with the HTTP request the message would be <code>XMLHttpRequest</code> object's  <code>statusText</code>. </p>
+
+<h4>
+<a id="complete" class="anchor" href="#complete" aria-hidden="true"><span class="octicon octicon-link"></span></a>complete</h4>
+
+<p>Type: <code>Function</code></p>
+
+<p>The callback function to be called when the request finishes (after success and error callbacks are executed). The function gets passed the <code>XMLHttpRequest</code> object's  <code>statusText</code>.</p>
+
+<h4>
+<a id="timeout" class="anchor" href="#timeout" aria-hidden="true"><span class="octicon octicon-link"></span></a>timeout</h4>
+
+<p>Type: <code>Number</code></p>
+
+<p>Timeout in milliseconds for the HTTP request. If a call exceeds the timeout, the call is aborted and error function is called.</p>
+
+<h4>
+<a id="method" class="anchor" href="#method" aria-hidden="true"><span class="octicon octicon-link"></span></a>method</h4>
+
+<p>Type: <code>String</code></p>
+
+<p>The HTTP method/type of request to make (e.g. <code>POST</code>, <code>DELETE</code>, <code>PUT</code>); default is <code>GET</code>.</p>
+
+<h4>
+<a id="headers" class="anchor" href="#headers" aria-hidden="true"><span class="octicon octicon-link"></span></a>headers</h4>
+
+<p>Type: <code>Object</code></p>
+
+<p>An object of additional header key/value pairs to send along with request.</p>
+
+<h4>
+<a id="data" class="anchor" href="#data" aria-hidden="true"><span class="octicon octicon-link"></span></a>data</h4>
+
+<p>Type: <code>String</code></p>
+
+<p>A serialized string to be sent in the request body for a POST/PUT request</p>
+
+<h2>
+<a id="testing" class="anchor" href="#testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p>The entire test suite for the jsonpipe API is available in the main test file  <a href="https://github.com/eBay/jsonpipe/blob/master/test/jsonpipe.js">jsonpipe.js</a>. The <a href="https://github.com/metaskills/mocha-phantomjs">mocha-phantomjs</a> wrapper is used as the testing framework and <a href="http://chaijs.com/api/assert/">chai</a> for assertion. To run the tests - clone/fork the <a href="https://github.com/eBay/jsonpipe">repo</a>, 
+install the package <code>$ npm install</code> and run</p>
+
+<pre><code>$ npm test
+</code></pre>
+
+<h2>
+<a id="issues" class="anchor" href="#issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues</h2>
+
+<p>Have a bug or a feature request? <a href="https://github.com/eBay/jsonpipe/issues">Please open a new issue</a></p>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author(s)</h2>
+
+<p><a href="http://senthilp.com/">Senthil Padmanabhan</a></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright (c) 2015 eBay Inc.</p>
+
+<p>Released under the MIT License
+<a href="http://www.opensource.org/licenses/MIT">http://www.opensource.org/licenses/MIT</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">jsonpipe maintained by <a href="https://github.com/eBay">eBay</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
