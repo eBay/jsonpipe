@@ -23,6 +23,9 @@ To use jsonpipe, the server should
 
 ##Usage
 [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/jsonpipe.js) is bundled as a [browserify CommonJS](http://dontkry.com/posts/code/browserify-and-the-universal-module-definition.html) module, so it can be used in the same node.js `require` style. It has only one API named `flow` exposed 
+```HTML
+    <script src="jsonpipe.js"></script>
+```
 ```JavaScript
     var jsonpipe = require('jsonpipe');
 	/**
