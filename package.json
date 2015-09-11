@@ -1,6 +1,6 @@
 {
   "name": "jsonpipe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "AJAX utility for consuming chunked JSON responses",
   "main": "./lib/jsonpipe.js",
   "scripts": {
