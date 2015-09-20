@@ -76,7 +76,7 @@ var xhr = _dereq_('./net/xhr'),
                     }
                     start = finish + token.length; // move the start
                 }
-                offset = offset + start; // move the offset
+                offset += start; // move the offset
 
                 // Get the remaning chunk
                 chunk = text.substring(offset);
@@ -95,6 +95,7 @@ var xhr = _dereq_('./net/xhr'),
 module.exports = {
     flow: ajax
 };
+
 },{"./net/xhr":2}],2:[function(_dereq_,module,exports){
 'use strict';
 
