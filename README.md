@@ -1,4 +1,5 @@
 #jsonpipe [![Build Status](https://travis-ci.org/eBay/jsonpipe.svg?branch=master)](https://travis-ci.org/eBay/jsonpipe)
+[![Dependency Status](https://david-dm.org/ebay/jsonpipe.svg)](https://david-dm.org/ebay/jsonpipe)  [![devDependency Status](https://david-dm.org/ebay/jsonpipe/dev-status.svg)](https://david-dm.org/ebay/jsonpipe#info=devDependencies)
 
 jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is similar to [jQuery ajax](http://api.jquery.com/jquery.ajax/), but for JSON responses transmitted through [chunked encoding](http://en.wikipedia.org/wiki/Chunked_transfer_encoding). It is a standalone utility with no dependencies. 
 
