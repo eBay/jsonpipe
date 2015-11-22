@@ -81,6 +81,7 @@ describe('jsonpipe', function() {
             });
             assert.instanceOf(xhr, XMLHttpRequest);
         });
+
         it('should check if request headers are set right', function() {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function() {},
@@ -89,6 +90,21 @@ describe('jsonpipe', function() {
                 }
             });
             assert.equal(xhr.requestHeaders['x-test'], 'jsonpipe');
+        });
+
+        it('should default withCredentials to true if not specified in options', function() {
+            var xhr = jsonpipe.flow(testUrl, {
+                "success": function () {}
+            });
+            assert.equal(xhr.withCredentials, true)
+        });
+
+        it('should set withCredentials baed on the supplied options', function() {
+            var xhr = jsonpipe.flow(testUrl, {
+                "success": function () {},
+                "withCredentials": false
+            });
+            assert.equal(xhr.withCredentials, false)
         });
     });
 

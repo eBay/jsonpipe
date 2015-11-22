@@ -50,7 +50,8 @@ To use jsonpipe, the server should
         "headers": { // Object. An object of additional header key/value pairs to send along with request
             "X-Requested-With": "XMLHttpRequest"
         },
-        "data": "" // String. A serialized string to be sent in a POST/PUT request
+        "data": "", // String. A serialized string to be sent in a POST/PUT request,
+        "withCredentials": true // Boolean. Send cookies when making cross-origin requests; default is true
     });
 ```
 
