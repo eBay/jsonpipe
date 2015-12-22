@@ -6,7 +6,8 @@ var gulp = require('gulp'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
     istanbul = require('gulp-istanbul'),
     istanbulReport = require('gulp-istanbul-report'),
-    coveralls = require('gulp-coveralls');
+    coveralls = require('gulp-coveralls'),
+    clean = require('gulp-clean');
 
 // Build task, to generate the bundled browserify file
 gulp.task('build', function() {
@@ -35,7 +36,7 @@ gulp.task('instrument', ['build'], function() {
 });
 
 // Add the test coverage task task
-gulp.task('test-cov', ['instrument'], function() {
+gulp.task('test-coveralls', ['instrument'], function() {
     var htmlFile = 'test/jsonpipe.html',
         replaceStrs = ['../jsonpipe.js', '../lib-cov/jsonpipe.js'],
         coverageJSON = 'coverage/coverage.json';
@@ -60,12 +61,12 @@ gulp.task('test-cov', ['instrument'], function() {
             return gulp.src(htmlFile)
                 .pipe(replace.apply(null, replaceStrs.reverse()))
                 .pipe(gulp.dest('test'));
+        })
+        // submit to coveralls
+        .on('finish', function() {
+            return gulp.src('./coverage/lcov.info')
+                .pipe(coveralls());
         });
-});
-
-gulp.task('test-coveralls', ['test-cov'], function() {
-    return gulp.src('./coverage/lcov.info')
-        .pipe(coveralls());
 });
 
 // Make the default task as test

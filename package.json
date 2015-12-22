@@ -5,7 +5,7 @@
   "main": "./lib/jsonpipe.js",
   "scripts": {
     "test": "gulp test",
-    "coveralls": "gulp test-coveralls && rm -rf ./coverage"
+    "coveralls": "gulp test-coveralls && rm -rf ./coverage && rm -rf ./lib-cov"
   },
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "gulp": "~3.8.11",
     "gulp-browserify": "~0.5.1",
+    "gulp-clean": "^0.3.1",
     "gulp-coveralls": "^0.1.4",
     "gulp-istanbul": "^0.10.3",
     "gulp-istanbul-report": "0.0.1",
