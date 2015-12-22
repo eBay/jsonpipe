@@ -63,7 +63,7 @@ gulp.task('test-cov', ['instrument'], function() {
         });
 });
 
-gulp.task('report-coveralls', ['test-cov'], function() {
+gulp.task('report-coveralls', function() {
     return gulp.src('./coverage/lcov.info')
         .pipe(coveralls());
 });
