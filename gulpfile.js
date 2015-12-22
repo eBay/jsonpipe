@@ -62,11 +62,15 @@ gulp.task('test-coveralls', ['instrument'], function() {
                 .pipe(replace.apply(null, replaceStrs.reverse()))
                 .pipe(gulp.dest('test'));
         })
-        // submit to coveralls
+        // report to coveralls
         .on('finish', function() {
-            return gulp.src('./coverage/lcov.info')
-                .pipe(coveralls());
+            gulp.run('report-coveralls');
         });
+});
+
+gulp.task('report-coveralls', function() {
+    return gulp.src('./coverage/lcov.info')
+        .pipe(coveralls());
 });
 
 // Make the default task as test
