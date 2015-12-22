@@ -4,7 +4,8 @@
   "description": "AJAX utility for consuming chunked JSON responses",
   "main": "./lib/jsonpipe.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "coveralls": "gulp test-coveralls && gulp report-coveralls"
   },
   "repository": {
     "type": "git",

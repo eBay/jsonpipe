@@ -61,10 +61,6 @@ gulp.task('test-coveralls', ['instrument'], function() {
             return gulp.src(htmlFile)
                 .pipe(replace.apply(null, replaceStrs.reverse()))
                 .pipe(gulp.dest('test'));
-        })
-        // report to coveralls
-        .on('finish', function() {
-            gulp.run('report-coveralls');
         });
 });
 
