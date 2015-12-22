@@ -5,7 +5,7 @@
   "main": "./lib/jsonpipe.js",
   "scripts": {
     "test": "gulp test",
-    "coveralls": "gulp test-coveralls && gulp report-coveralls"
+    "coveralls": "gulp test-coveralls && gulp report-coveralls && rm -rf coverage && rm -rf lib-cov"
   },
   "repository": {
     "type": "git",
