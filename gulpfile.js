@@ -36,7 +36,7 @@ gulp.task('instrument', ['build'], function() {
 });
 
 // Add the test coverage task task
-gulp.task('test-coveralls', ['instrument'], function() {
+gulp.task('test-cov', ['instrument'], function() {
     var htmlFile = 'test/jsonpipe.html',
         replaceStrs = ['../jsonpipe.js', '../lib-cov/jsonpipe.js'],
         coverageJSON = 'coverage/coverage.json';
@@ -51,20 +51,19 @@ gulp.task('test-coveralls', ['instrument'], function() {
                 coverageFile: coverageJSON
             }
         }))
-        // generate coverage.json after finish
         .on('finish', function() {
-            return gulp.src(coverageJSON)
+            // generate coverage.json after finish
+            gulp.src(coverageJSON)
                 .pipe(istanbulReport({reporters: ['lcov']}));
-        })
-        // Revert the html file
-        .on('finish', function() {
-            return gulp.src(htmlFile)
+
+            // Revert the html file
+            gulp.src(htmlFile)
                 .pipe(replace.apply(null, replaceStrs.reverse()))
                 .pipe(gulp.dest('test'));
         });
 });
 
-gulp.task('report-coveralls', function() {
+gulp.task('report-coveralls', ['test-cov'], function() {
     return gulp.src('./coverage/lcov.info')
         .pipe(coveralls());
 });
