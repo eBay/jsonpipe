@@ -1,4 +1,4 @@
-/*global describe, it, before, after*/
+/*global describe, it, before, after, JSON*/
 'use strict';
 
 // A require to work on node or browser
@@ -94,17 +94,17 @@ describe('jsonpipe', function() {
 
         it('should default withCredentials to true if not specified in options', function() {
             var xhr = jsonpipe.flow(testUrl, {
-                "success": function () {}
+                "success": function() {}
             });
-            assert.equal(xhr.withCredentials, true)
+            assert.equal(xhr.withCredentials, true);
         });
 
         it('should set withCredentials baed on the supplied options', function() {
             var xhr = jsonpipe.flow(testUrl, {
-                "success": function () {},
+                "success": function() {},
                 "withCredentials": false
             });
-            assert.equal(xhr.withCredentials, false)
+            assert.equal(xhr.withCredentials, false);
         });
     });
 
@@ -200,6 +200,23 @@ describe('jsonpipe', function() {
             xhr.chunkSize = 20;
             xhr.respond(200, headers,
                 '{"id": 0}\n\n{"id": 1}');
+        });
+
+        it('should process a JSON response with 1 chunk, and JSON separated with \\n\\n and ending with \\n\\n', function(done) { //jshint ignore:line
+            var chunkCount = 0,
+                xhr = jsonpipe.flow(testUrl, {
+                    "success": function(data) {
+                        assert.equal(data.id, chunkCount++);
+                        if (chunkCount === 2) {
+                            done();
+                        }
+                    }
+                });
+
+            // increase the chunkSize
+            xhr.chunkSize = 20;
+            xhr.respond(200, headers,
+                '{"id": 0}\n\n{"id": 1}\n\n');
         });
 
         it('should process a JSON response with multile chunks', function(done) {
