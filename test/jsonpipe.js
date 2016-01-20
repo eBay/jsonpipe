@@ -214,7 +214,7 @@ describe('jsonpipe', function() {
                 });
 
             // increase the chunkSize
-            xhr.chunkSize = 20;
+            xhr.chunkSize = 40;
             xhr.respond(200, headers,
                 '{"id": 0}\n\n{"id": 1}\n\n');
         });
