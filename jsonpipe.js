@@ -154,7 +154,7 @@ function send(url, options) {
             // clear timeout first
             clearTimeout(timer);
             // Check for error first
-            if (xhr.status !== 200) {
+            if (xhr.status < 200 || xhr.status > 299) {
                 errorFn(xhr.statusText);
             } else {
                 onChunk(xhr.responseText, true);
