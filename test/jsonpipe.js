@@ -321,6 +321,24 @@ describe('jsonpipe', function() {
             xhr.respond(200, headers,
                 '\r\r{"id": 0}\r\r{"id": 1}\r\r{"id": 2}\r\r');
         });
+
+        it('should process a JSON response which has a success code other than 200', function(done) {
+            var chunkCount = 0,
+                xhr = jsonpipe.flow(testUrl, {
+                    "success": function(data) {
+                        assert.isArray(data);
+                        if (++chunkCount === 2) {
+                            done();
+                        }
+                    }
+                });
+
+            // reduce the chunkSize
+            xhr.chunkSize = 5;
+            xhr.respond(205, headers,
+                '[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
+        });
+
     });
 
     describe('vefiry error scenarios', function() {
