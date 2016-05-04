@@ -422,4 +422,19 @@ describe('jsonpipe', function() {
         });
     });
 
+    /* describe('verify a real server endpoint', function() {
+        this.timeout(15000);
+        it('should parse the response from a real server', function(done) {
+            var chunkCount = 0;
+            jsonpipe.flow('http://10.64.252.29/saas/SaasTest', {
+                "success": function(data) {
+                    assert.equal(typeof data, 'object');
+                    if (++chunkCount === 3) {
+                        done();
+                    }
+                },
+                withCredentials: false
+            });
+        });
+    }); */
 });
