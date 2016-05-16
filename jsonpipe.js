@@ -56,7 +56,7 @@ var xhr = _dereq_('./net/xhr'),
         }
 
         var offset = 0,
-            token = options.delimiter || '\r\n',
+            token = options.delimiter || '\n\n',
             onChunk = function(text, finalChunk) {
                 var chunk = text.substring(offset),
                     start = 0,

@@ -143,7 +143,7 @@ describe('jsonpipe', function() {
                 }));
         });
 
-        it('should process a JSON response with 1 chunk and ending with \\r\\n', function(done) {
+        it('should process a JSON response with 1 chunk and ending with \\n\\n', function(done) {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function(data) {
                     assert.equal(data.id, 7);
@@ -154,10 +154,10 @@ describe('jsonpipe', function() {
             // increase the chunkSize
             xhr.chunkSize = 20;
             xhr.respond(200, headers,
-                '{"id": 7}\r\n');
+                '{"id": 7}\n\n');
         });
 
-        it('should process a JSON response with 1 chunk and starting with \\r\\n', function(done) {
+        it('should process a JSON response with 1 chunk and starting with \\n\\n', function(done) {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function(data) {
                     assert.equal(data.id, 7);
@@ -168,10 +168,10 @@ describe('jsonpipe', function() {
             // increase the chunkSize
             xhr.chunkSize = 20;
             xhr.respond(200, headers,
-                '\r\n{"id": 7}');
+                '\n\n{"id": 7}');
         });
 
-        it('should process a JSON response with 1 chunk, starting and ending with \\r\\n', function(done) {
+        it('should process a JSON response with 1 chunk, starting and ending with \\n\\n', function(done) {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function(data) {
                     assert.equal(data.id, 7);
@@ -182,10 +182,10 @@ describe('jsonpipe', function() {
             // increase the chunkSize
             xhr.chunkSize = 20;
             xhr.respond(200, headers,
-                '\r\n{"id": 7}\r\n');
+                '\n\n{"id": 7}\n\n');
         });
 
-        it('should process a JSON response with 1 chunk, and JSON separated with \\r\\n', function(done) {
+        it('should process a JSON response with 1 chunk, and JSON separated with \\n\\n', function(done) {
             var chunkCount = 0,
                 xhr = jsonpipe.flow(testUrl, {
                     "success": function(data) {
@@ -199,10 +199,10 @@ describe('jsonpipe', function() {
             // increase the chunkSize
             xhr.chunkSize = 20;
             xhr.respond(200, headers,
-                '{"id": 0}\r\n{"id": 1}');
+                '{"id": 0}\n\n{"id": 1}');
         });
 
-        it('should process a JSON response with 1 chunk, and JSON separated with \\r\\n and ending with \\r\\n', function(done) { //jshint ignore:line
+        it('should process a JSON response with 1 chunk, and JSON separated with \\n\\n and ending with \\n\\n', function(done) { //jshint ignore:line
             var chunkCount = 0,
                 xhr = jsonpipe.flow(testUrl, {
                     "success": function(data) {
@@ -216,7 +216,7 @@ describe('jsonpipe', function() {
             // increase the chunkSize
             xhr.chunkSize = 40;
             xhr.respond(200, headers,
-                '{"id": 0}\r\n{"id": 1}\r\n');
+                '{"id": 0}\n\n{"id": 1}\n\n');
         });
 
         it('should process a JSON response with multile chunks', function(done) {
@@ -233,7 +233,7 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 5;
             xhr.respond(200, headers,
-                '{"id": 0}\r\n{"id": 1}\r\n{"id": 2}');
+                '{"id": 0}\n\n{"id": 1}\n\n{"id": 2}');
         });
 
         it('should process a JSON response with multile chunks and bigger buffer size', function(done) {
@@ -250,10 +250,10 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 15;
             xhr.respond(200, headers,
-                '{"id": 0}\r\n{"id": 1}\r\n{"id": 2}');
+                '{"id": 0}\n\n{"id": 1}\n\n{"id": 2}');
         });
 
-        it('should process a JSON response with multile chunks, staring and ending with \\r\\n', function(done) {
+        it('should process a JSON response with multile chunks, staring and ending with \\n\\n', function(done) {
             var chunkCount = 0,
                 xhr = jsonpipe.flow(testUrl, {
                     "success": function(data) {
@@ -267,7 +267,7 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 5;
             xhr.respond(200, headers,
-                '\r\n{"id": 0}\r\n{"id": 1}\r\n{"id": 2}\r\n');
+                '\n\n{"id": 0}\n\n{"id": 1}\n\n{"id": 2}\n\n');
         });
 
         it('should process a JSON response with multile chunks, and a complete function', function(done) {
@@ -284,7 +284,7 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 5;
             xhr.respond(200, headers,
-                '\r\n{"id": 0}\r\n{"id": 1}\r\n{"id": 2}\r\n');
+                '\n\n{"id": 0}\n\n{"id": 1}\n\n{"id": 2}\n\n');
         });
 
         it('should process a JSON response which has Array chunks', function(done) {
@@ -301,7 +301,7 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 5;
             xhr.respond(200, headers,
-                '[{"id": 0},{"id": 1}]\r\n[{"id": 2},{"id": 3}]');
+                '[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
         });
 
         it('should process a multi chunk JSON response separated with the provided option delimiter', function(done) {
@@ -336,7 +336,7 @@ describe('jsonpipe', function() {
             // reduce the chunkSize
             xhr.chunkSize = 5;
             xhr.respond(205, headers,
-                '[{"id": 0},{"id": 1}]\r\n[{"id": 2},{"id": 3}]');
+                '[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
         });
 
     });
@@ -368,7 +368,7 @@ describe('jsonpipe', function() {
                     }
                 });
 
-            xhr.respond(200, headers, '{"id"\r\n}');
+            xhr.respond(200, headers, '{"id"\n\n}');
 
         });
 
@@ -390,7 +390,7 @@ describe('jsonpipe', function() {
                     }
                 });
 
-            xhr.respond(200, headers, '{"id"}\r\n{"id": 1}');
+            xhr.respond(200, headers, '{"id"}\n\n{"id": 1}');
 
         });
 
@@ -422,19 +422,4 @@ describe('jsonpipe', function() {
         });
     });
 
-    /* describe('verify a real server endpoint', function() {
-        this.timeout(15000);
-        it('should parse the response from a real server', function(done) {
-            var chunkCount = 0;
-            jsonpipe.flow('http://10.64.252.29/saas/SaasTest', {
-                "success": function(data) {
-                    assert.equal(typeof data, 'object');
-                    if (++chunkCount === 3) {
-                        done();
-                    }
-                },
-                withCredentials: false
-            });
-        });
-    }); */
 });
