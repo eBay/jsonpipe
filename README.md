@@ -36,6 +36,9 @@ To use jsonpipe, the server should
      */
     jsonpipe.flow('http://api.com/items?q=batman', {
     	"delimiter": "", // String. The delimiter separating valid JSON objects; default is "\n\n"
+        "onHeaders": function(statusText, headers) {
+            // Do something with the headers and the statusText.
+        }
         "success": function(data) {
             // Do something with this JSON chunk
         },
@@ -60,6 +63,11 @@ To use jsonpipe, the server should
 Type: `String`
 
 The delimiter separating valid JSON objects in the chunked response; default is `\n\n`
+
+####onHeaders
+Type: `Function`
+
+The callback function to be called when headers are received. The function gets passed the the `XMLHttpRequest` object's  `statusText` and the headers.
 
 ####success
 Type: `Function`

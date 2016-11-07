@@ -82,6 +82,14 @@ describe('jsonpipe', function() {
             assert.instanceOf(xhr, XMLHttpRequest);
         });
 
+        it('should return XMLHttpRequest object when called with url, success and onHeaders attributes', function() {
+            var xhr = jsonpipe.flow(testUrl, {
+                "success": function() {},
+                "onHeaders": function() {}
+            });
+            assert.isObject(xhr);
+        });
+
         it('should check if request headers are set right', function() {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function() {},
@@ -105,6 +113,45 @@ describe('jsonpipe', function() {
                 "withCredentials": false
             });
             assert.equal(xhr.withCredentials, false);
+        });
+    });
+
+    describe('verify onHeaders scenarios', function() {
+
+        var fakexhr,
+            headers = {
+                "Content-Type": "application/json",
+                "Transfer-Encoding": "chunked"
+            };
+
+        before(function() {
+            fakexhr = sinon.useFakeXMLHttpRequest();
+        });
+
+        after(function() {
+            fakexhr.restore();
+        });
+
+        it('should receive headers', function(done) {
+            var xhr = jsonpipe.flow(testUrl, {
+                "success": function() {},
+                "onHeaders": function(statusText, headers) {
+                    assert.equal(statusText, 'OK');
+                    assert.equal(headers["x-example-test"], "test value");
+                    done();
+                }
+            });
+
+            // increase the chunkSize
+            xhr.chunkSize = 20;
+
+            xhr.respond(200, {
+                    "Content-Type": "application/json",
+                    "X-Example-Test": "test value"
+                },
+                JSON.stringify({
+                    "id": 7
+                }));
         });
     });
 
