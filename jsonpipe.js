@@ -1,4 +1,5 @@
 !function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.jsonpipe=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+/* eslint no-param-reassign:0 */
 'use strict';
 
 var xhr = _dereq_('./net/xhr'),
@@ -13,7 +14,7 @@ var xhr = _dereq_('./net/xhr'),
         if (!chunk || !/^[\{|\[].*[\}|\]]$/.test(chunk)) {
             throw new Error('parseerror');
         }
-        return eval('(' + chunk + ')');
+        return eval('(' + chunk + ')'); // eslint-disable-line no-eval
     },
     parse = function(chunk, success, error) {
         var jsonObj;
@@ -39,7 +40,7 @@ var xhr = _dereq_('./net/xhr'),
     ajax = function(url, options) {
         // Do all prerequisite checks
         if (!url) {
-            return;
+            return undefined;
         }
 
         // Set arguments if first argument is not string
@@ -52,7 +53,7 @@ var xhr = _dereq_('./net/xhr'),
         if (!url ||
             !options ||
             !(options.success || options.error || options.complete)) {
-            return;
+            return undefined;
         }
 
         var offset = 0,
@@ -66,15 +67,19 @@ var xhr = _dereq_('./net/xhr'),
                     subChunk;
 
                 if (finish === 0) { // The delimiter is at the beginning so move the start
-                    start = finish + token.length;
+                    start = token.length;
                 }
 
-                while ((finish = chunk.indexOf(token, start)) > -1) {
+                // Re-assign finish to the next token
+                finish = chunk.indexOf(token, start);
+
+                while (finish > -1) {
                     subChunk = chunk.substring(start, finish);
                     if (subChunk) {
                         parse(subChunk, successFn, errorFn);
                     }
                     start = finish + token.length; // move the start
+                    finish = chunk.indexOf(token, start); // Re-assign finish to the next token
                 }
                 offset += start; // move the offset
 
@@ -101,32 +106,32 @@ module.exports = {
 
 var trim = ''.trim
   ? function(s) { return s.trim(); }
-  : function(s) { return s.replace(/(^\s*|\s*$)/g, ''); }
+  : function(s) { return s.replace(/(^\s*|\s*$)/g, ''); };
 
 function parseHeader(str) {
-  var lines = str.split(/\r?\n/);
-  var fields = {};
-  var index;
-  var line;
-  var field;
-  var val;
+    var lines = str.split(/\r?\n/);
+    var fields = {};
+    var index;
+    var line;
+    var field;
+    var val;
 
-  lines.pop(); // trailing CRLF
+    lines.pop(); // trailing CRLF
 
-  for (var i = 0, len = lines.length; i < len; ++i) {
-    line = lines[i];
-    index = line.indexOf(':');
-    field = line.slice(0, index).toLowerCase();
-    val = trim(line.slice(index + 1));
-    fields[field] = val;
-  }
+    for (var i = 0, len = lines.length; i < len; ++i) {
+        line = lines[i];
+        index = line.indexOf(':');
+        field = line.slice(0, index).toLowerCase();
+        val = trim(line.slice(index + 1));
+        fields[field] = val;
+    }
 
-  return fields;
+    return fields;
 }
 
 function send(url, options) {
     if (!url || !options) {
-        return;
+        return undefined;
     }
 
     var xhr = new XMLHttpRequest(),
@@ -172,7 +177,7 @@ function send(url, options) {
                 chromeSpdy = loadTimes && loadTimes.wasFetchedViaSpdy;
                 isChunked = !!(xhr.getResponseHeader('X-Firefox-Spdy') || chromeSpdy);
             }
-            onHeaders(xhr.statusText, parseHeader(xhr.getAllResponseHeaders()))
+            onHeaders(xhr.statusText, parseHeader(xhr.getAllResponseHeaders()));
         } else if (xhr.readyState === state.LOADING) {
             if (isChunked && xhr.responseText) {
                 onChunk(xhr.responseText);
@@ -193,7 +198,7 @@ function send(url, options) {
 
     // Add headers
     if (headers) {
-        for (var key in headers) {
+        for (var key in headers) { // eslint-disable-line guard-for-in
             xhr.setRequestHeader(key, headers[key]);
             if (key.toLowerCase() === 'content-type') {
                 addContentHeader = false;
