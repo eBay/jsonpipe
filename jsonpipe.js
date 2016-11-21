@@ -3,34 +3,7 @@
 'use strict';
 
 var xhr = _dereq_('./net/xhr'),
-    isString = function(str) {
-        return Object.prototype.toString.call(str) === '[object String]';
-    },
-    isFunction = function(fn) {
-        return Object.prototype.toString.call(fn) === '[object Function]';
-    },
-    // Do the eval trick, since JSON object not present
-    customParse = function(chunk) {
-        if (!chunk || !/^[\{|\[].*[\}|\]]$/.test(chunk)) {
-            throw new Error('parseerror');
-        }
-        return eval('(' + chunk + ')'); // eslint-disable-line no-eval
-    },
-    parse = function(chunk, success, error) {
-        var jsonObj;
-        try {
-            jsonObj = typeof JSON !== 'undefined' ? JSON.parse(chunk) : customParse(chunk);
-        } catch (ex) {
-            if (isFunction(error)) {
-                error('parsererror');
-            }
-            return;
-        }
-        // No parse error proceed to success
-        if (jsonObj && isFunction(success)) {
-            success(jsonObj);
-        }
-    },
+    utils = _dereq_('./utils.js'),
     /**
      * @param {String} url A string containing the URL to which the request is sent.
      * @param {Object} url A set of key/value pairs that configure the Ajax request.
@@ -44,7 +17,7 @@ var xhr = _dereq_('./net/xhr'),
         }
 
         // Set arguments if first argument is not string
-        if (!isString(url)) {
+        if (!utils.isString(url)) {
             options = url;
             url = options.url;
         }
@@ -76,7 +49,7 @@ var xhr = _dereq_('./net/xhr'),
                 while (finish > -1) {
                     subChunk = chunk.substring(start, finish);
                     if (subChunk) {
-                        parse(subChunk, successFn, errorFn);
+                        utils.parse(subChunk, successFn, errorFn);
                     }
                     start = finish + token.length; // move the start
                     finish = chunk.indexOf(token, start); // Re-assign finish to the next token
@@ -87,7 +60,7 @@ var xhr = _dereq_('./net/xhr'),
                 chunk = text.substring(offset);
                 // If final chunk and still unprocessed chunk and no delimiter, then execute the full chunk
                 if (finalChunk && chunk && finish === -1) {
-                    parse(chunk, successFn, errorFn);
+                    utils.parse(chunk, successFn, errorFn);
                 }
             };
 
@@ -101,7 +74,7 @@ module.exports = {
     flow: ajax
 };
 
-},{"./net/xhr":2}],2:[function(_dereq_,module,exports){
+},{"./net/xhr":2,"./utils.js":3}],2:[function(_dereq_,module,exports){
 'use strict';
 
 var trim = ''.trim
@@ -231,6 +204,47 @@ function send(url, options) {
 
 module.exports = {
     send: send
+};
+
+},{}],3:[function(_dereq_,module,exports){
+'use strict';
+
+function isString(str) {
+    return Object.prototype.toString.call(str) === '[object String]';
+}
+
+function isFunction(fn) {
+    return Object.prototype.toString.call(fn) === '[object Function]';
+}
+
+// Do the eval trick, since JSON object not present
+function customParse(chunk) {
+    if (!chunk || !/^[\{|\[].*[\}|\]]$/.test(chunk)) {
+        throw new Error('parseerror');
+    }
+    return eval('(' + chunk + ')'); // eslint-disable-line no-eval
+}
+
+function parse(chunk, successCb, errorCb) {
+    var jsonObj;
+    try {
+        jsonObj = typeof JSON !== 'undefined' ? JSON.parse(chunk) : customParse(chunk);
+    } catch (ex) {
+        if (isFunction(errorCb)) {
+            errorCb('parsererror');
+        }
+        return;
+    }
+    // No parse error proceed to success
+    if (jsonObj && isFunction(successCb)) {
+        successCb(jsonObj);
+    }
+}
+
+module.exports = {
+    isString: isString,
+    isFunction: isFunction,
+    parse: parse
 };
 
 },{}]},{},[1])

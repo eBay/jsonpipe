@@ -1,20 +1,19 @@
-/*global describe, it, before, after, JSON*/
+/* global describe, it, before, after, JSON */
 'use strict';
 
 // A require to work on node or browser
 function smartRequire(name, windowName) {
-    var stripName = function(name) {
-        if (!name) {
-            return;
+    var stripName = function(moduleName) {
+        if (!moduleName) {
+            return moduleName;
         }
-        var strippedName = name.match(/\/([^\/]+)$/);
-        return strippedName ? strippedName[1] : name;
+        var strippedName = moduleName.match(/\/([^\/]+)$/);
+        return strippedName ? strippedName[1] : moduleName;
     };
     if (typeof require === 'function') {
         return require(name);
-    } else {
-        return window[windowName || stripName(name)];
     }
+    return window[windowName || stripName(name)];
 }
 
 var assert = smartRequire('chai').assert,
@@ -32,7 +31,6 @@ describe('jsonpipe', function() {
     });
 
     describe('verify the iterface', function() {
-
         var fakexhr;
 
         before(function() {
@@ -117,12 +115,7 @@ describe('jsonpipe', function() {
     });
 
     describe('verify onHeaders scenarios', function() {
-
-        var fakexhr,
-            headers = {
-                "Content-Type": "application/json",
-                "Transfer-Encoding": "chunked"
-            };
+        var fakexhr;
 
         before(function() {
             fakexhr = sinon.useFakeXMLHttpRequest();
@@ -135,9 +128,9 @@ describe('jsonpipe', function() {
         it('should receive headers', function(done) {
             var xhr = jsonpipe.flow(testUrl, {
                 "success": function() {},
-                "onHeaders": function(statusText, headers) {
+                "onHeaders": function(statusText, header) {
                     assert.equal(statusText, 'OK');
-                    assert.equal(headers["x-example-test"], "test value");
+                    assert.equal(header["x-example-test"], "test value");
                     done();
                 }
             });
@@ -146,17 +139,16 @@ describe('jsonpipe', function() {
             xhr.chunkSize = 20;
 
             xhr.respond(200, {
-                    "Content-Type": "application/json",
-                    "X-Example-Test": "test value"
-                },
-                JSON.stringify({
-                    "id": 7
-                }));
+                "Content-Type": "application/json",
+                "X-Example-Test": "test value"
+            },
+            JSON.stringify({
+                "id": 7
+            }));
         });
     });
 
     describe('verify success scenarios', function() {
-
         var fakexhr,
             headers = {
                 "Content-Type": "application/json",
@@ -183,11 +175,11 @@ describe('jsonpipe', function() {
             xhr.chunkSize = 20;
 
             xhr.respond(200, {
-                    "Content-Type": "application/json"
-                },
-                JSON.stringify({
-                    "id": 7
-                }));
+                "Content-Type": "application/json"
+            },
+            JSON.stringify({
+                "id": 7
+            }));
         });
 
         it('should process a JSON response with 1 chunk and ending with \\n\\n', function(done) {
@@ -249,7 +241,7 @@ describe('jsonpipe', function() {
                 '{"id": 0}\n\n{"id": 1}');
         });
 
-        it('should process a JSON response with 1 chunk, and JSON separated with \\n\\n and ending with \\n\\n', function(done) { //jshint ignore:line
+        it('should process a JSON response with 1 chunk, and JSON separated with \\n\\n and ending with \\n\\n', function(done) { // eslint-disable-line max-len
             var chunkCount = 0,
                 xhr = jsonpipe.flow(testUrl, {
                     "success": function(data) {
@@ -385,11 +377,9 @@ describe('jsonpipe', function() {
             xhr.respond(205, headers,
                 '[{"id": 0},{"id": 1}]\n\n[{"id": 2},{"id": 3}]');
         });
-
     });
 
     describe('vefiry error scenarios', function() {
-
         var fakexhr,
             headers = {
                 "Content-Type": "application/json",
@@ -416,7 +406,6 @@ describe('jsonpipe', function() {
                 });
 
             xhr.respond(200, headers, '{"id"\n\n}');
-
         });
 
         it('should call success function on valid chunk and error function on invalid JSON chunk', function(done) {
@@ -438,7 +427,6 @@ describe('jsonpipe', function() {
                 });
 
             xhr.respond(200, headers, '{"id"}\n\n{"id": 1}');
-
         });
 
         it('should call error function if timeout exceeded', function(done) {
@@ -456,7 +444,6 @@ describe('jsonpipe', function() {
         });
 
         it('should call error function on HTTP response code other than 200. e.g. 404', function(done) {
-
             var xhr = jsonpipe.flow(testUrl, {
                 "error": function(msg) {
                     assert.equal(xhr.status, '404');
