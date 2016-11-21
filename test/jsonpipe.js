@@ -456,6 +456,38 @@ describe('jsonpipe', function() {
         });
     });
 
+    describe('verify different Content-Type Headers', function() {
+        var fakexhr;
+
+        before(function() {
+            fakexhr = sinon.useFakeXMLHttpRequest();
+        });
+
+        after(function() {
+            fakexhr.restore();
+        });
+
+        it('should receive content-type header as set in the response', function(done) {
+            var xhr = jsonpipe.flow(testUrl, {
+                "success": function() {},
+                "onHeaders": function(statusText, header) {
+                    assert.equal(statusText, 'OK');
+                    assert.equal(header["content-type"], "multipart/json");
+                    done();
+                }
+            });
+
+            // increase the chunkSize
+            xhr.chunkSize = 20;
+
+            xhr.respond(200, {
+                "content-type": "multipart/json",
+                "Transfer-Encoding": "chunked"
+            },
+            '{"id": 0}\n\n{"id": 1}\n\n');
+        });
+    });
+
     /* describe('verify a real server endpoint', function() {
         this.timeout(15000);
         it('should parse the response from a real server', function(done) {
