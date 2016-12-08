@@ -488,6 +488,39 @@ describe('jsonpipe', function() {
         });
     });
 
+    describe('verify json-array responses', function() {
+        var fakexhr,
+            headers = {
+                "Content-Type": "application/json",
+                "Transfer-Encoding": "chunked"
+            };
+
+        before(function() {
+            fakexhr = sinon.useFakeXMLHttpRequest();
+        });
+
+        after(function() {
+            fakexhr.restore();
+        });
+
+        it('should process a simple JSON Array response with one object in the Array', function(done) {
+            var xhr = jsonpipe.flow(testUrl, {
+                parserType: "json-array",
+                "success": function(data) {
+                    assert.equal(data.id, 7);
+                    done();
+                }
+            });
+
+            // increase the chunkSize
+            xhr.chunkSize = 20;
+
+            xhr.respond(200, headers, JSON.stringify([
+                { "id": 7 }
+            ]));
+        });
+    });
+
     /* describe('verify a real server endpoint', function() {
         this.timeout(15000);
         it('should parse the response from a real server', function(done) {

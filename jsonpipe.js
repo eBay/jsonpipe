@@ -3,47 +3,56 @@
 'use strict';
 
 var xhr = _dereq_('./net/xhr'),
-    utils = _dereq_('./utils.js'),
-    Parser = _dereq_('./parsers/json-chunk'),
-    /**
-     * @param {String} url A string containing the URL to which the request is sent.
-     * @param {Object} url A set of key/value pairs that configure the Ajax request.
-     * @return {XMLHttpRequest} The XMLHttpRequest object for this request.
-     * @method ajax
-     */
-    ajax = function(url, options) {
-        // Do all prerequisite checks
-        if (!url) {
-            return undefined;
-        }
+    utils = _dereq_('./utils.js');
 
-        // Set arguments if first argument is not string
-        if (!utils.isString(url)) {
-            options = url;
-            url = options.url;
-        }
+function getParser(parserType) {
+    switch (parserType.toLowerCase()) {
+        case 'json-array':
+            return _dereq_('./parsers/json-array');
+        default:
+            return _dereq_('./parsers/json-chunk');
+    }
+}
 
-        // Check if all mandatory attributes are present
-        if (!url ||
-            !options ||
-            !(options.success || options.error || options.complete)) {
-            return undefined;
-        }
+/**
+ * @param {String} url A string containing the URL to which the request is sent.
+ * @param {Object} url A set of key/value pairs that configure the Ajax request.
+ * @return {XMLHttpRequest} The XMLHttpRequest object for this request.
+ * @method ajax
+ */
+function ajax(url, options) {
+    // Do all prerequisite checks
+    if (!url) {
+        return undefined;
+    }
 
-        // Init the parser
-        var parser = new Parser(options);
+    // Set arguments if first argument is not string
+    if (!utils.isString(url)) {
+        options = url;
+        url = options.url;
+    }
 
-        // Assign onChunk to options with parse function, binded to the parser object
-        options.onChunk = parser.parse.bind(parser);
+    // Check if all mandatory attributes are present
+    if (!url ||
+        !options ||
+        !(options.success || options.error || options.complete)) {
+        return undefined;
+    }
 
-        return xhr.send(url, options);
-    };
+    var Parser = getParser(options.parserType || 'json-chunk'), // Retrieve the Parser based on parser type
+        parser = new Parser(options); // Create a new Parser instance
+
+    // Assign onChunk to options with parse function, binded to the parser object
+    options.onChunk = parser.parse.bind(parser);
+
+    return xhr.send(url, options);
+}
 
 module.exports = {
     flow: ajax
 };
 
-},{"./net/xhr":2,"./parsers/json-chunk":3,"./utils.js":4}],2:[function(_dereq_,module,exports){
+},{"./net/xhr":2,"./parsers/json-array":3,"./parsers/json-chunk":4,"./utils.js":5}],2:[function(_dereq_,module,exports){
 'use strict';
 
 var trim = ''.trim
@@ -180,6 +189,106 @@ module.exports = {
 
 var utils = _dereq_('../utils.js');
 
+function isDoubleQuoteEscaped(text) {
+    var currentIndex = text.length - 1, // Start from the back of the string
+        backslashCount = 0;
+
+    // If last character is double quote then move back
+    if (text[currentIndex] === '"') {
+        currentIndex--;
+    }
+
+    while (currentIndex > 0) {
+        // if not backslash break it
+        if (text[currentIndex] !== '\\') {
+            break;
+        }
+        backslashCount++;
+        currentIndex--;
+    }
+    // If odd number of backslashes then the double quote is escaped
+    return backslashCount % 2;
+}
+
+// Get the first unescaped end double quote index
+function getStringEndIndex(text) {
+    if (!text) {
+        return 0;
+    }
+
+    var currentIndex = 0;
+
+    // if text starts with a double quote, then skip to next postion
+    if (text[currentIndex] === '"') {
+        currentIndex++;
+    }
+
+    while (currentIndex < text.length) {
+        // Check for closing double quote and check if it is not escaped
+        if (text[currentIndex] === '"' && !isDoubleQuoteEscaped(text.substring(0, currentIndex))) {
+            break;
+        }
+        currentIndex++;
+    }
+    return currentIndex;
+}
+
+function Parser(options) {
+    this.offset = 0;
+    this.success = options.success;
+    this.error = options.error;
+}
+
+Parser.prototype.parse = function(text, finalChunk) {
+    var chunk = text.substring(this.offset),
+        curlyBraceCount = 0,
+        startIndex = -1;
+
+    for (var currentIndex = 0; currentIndex < chunk.length; currentIndex++) {
+        if (chunk[currentIndex] === '{') {
+            // if curlyBraceCount is zero, then the object is just getting started
+            if (curlyBraceCount === 0) {
+                startIndex = currentIndex;
+            }
+            curlyBraceCount++;
+        }
+
+        if (chunk[currentIndex] === '}') {
+            curlyBraceCount--;
+        }
+
+        // If string we need do special treatment to check for curly braces inside a string
+        // So just move to the end of the string
+        if (chunk[currentIndex] === '"') {
+            currentIndex = currentIndex + getStringEndIndex(chunk.substring(currentIndex));
+        }
+
+        if (curlyBraceCount === 0 && startIndex > -1) {
+            utils.parse(chunk.substring(startIndex, currentIndex + 1), this.success, this.error);
+
+            // Reset the offset to the next pointer of currentIndex
+            this.offset = currentIndex + 1;
+
+            // Rest startIndex
+            startIndex = -1;
+        }
+    }
+
+    // if finalChunk and curlyBraceCount is not zero then incomplete JSON
+    // In that case error out the remaining chunk, so the caller can come to a closure
+    if (finalChunk && curlyBraceCount !== 0) {
+        utils.parse(chunk.substring(this.offset), this.success, this.error);
+    }
+};
+
+module.exports = Parser;
+
+
+},{"../utils.js":5}],4:[function(_dereq_,module,exports){
+'use strict';
+
+var utils = _dereq_('../utils.js');
+
 function Parser(options) {
     this.offset = 0;
     this.token = options.delimiter || '\n\n';
@@ -221,7 +330,7 @@ Parser.prototype.parse = function(text, finalChunk) {
 module.exports = Parser;
 
 
-},{"../utils.js":4}],4:[function(_dereq_,module,exports){
+},{"../utils.js":5}],5:[function(_dereq_,module,exports){
 'use strict';
 
 function isString(str) {
