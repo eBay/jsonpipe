@@ -1,0 +1,76 @@
+{
+    "lasso": {
+        "plugins": [
+            "i18n/optimizer/plugin",
+            "lasso-marko",
+            {
+                "plugin": "lasso-less",
+                "config": {
+                    "extensions": ["less", "css"],
+                    "lessConfig": {
+                        "strictMath": true
+                    }
+                }
+            },
+            {
+                "plugin": "lasso-autoprefixer",
+                "config": {
+                    "browsers": "> 1%"
+                }
+            }
+        ],
+        "minifyInlineOnly": false,
+        "bundlingEnabled": false,
+        "cacheProfile": "development",
+        "fileWriter": {
+            "url-prefix": "/static",
+            "outputDir": "static",
+            "includeSlotNames": true,
+            "fingerprintsEnabled": false
+        }
+    },
+    "logging-inc": {
+        "loglevel": {
+            "debug": "hhhh:*,xxx:*"
+        }
+    },
+    "cal-publishing-inc": {
+        "appenders": {
+            "console": {
+                "enabled": true,
+                "loglevel": {
+                    "debug": "hhhh:*,xxx:*",
+                    "warn": "none",
+                    "transaction": "none",
+                    "error": "*"
+                }
+            }
+        }
+    },
+    "services": {
+        "mockServiceResponse": false,
+        "appMetadataSvc": {
+            "hostname": ".com"
+        },
+        "experienceservice": {
+            "hostname": ".com"
+        },
+        "browseexperienceservice": {
+            "hostname": ".com",
+            "port": 80,
+            "mockServiceResponse": false
+        },
+        "browseexperienceservicemoduleprovider": {
+            "hostname": ".com",
+            "port": 80
+        },
+        "browserefineexperienceservice": {
+            "hostname": ".com",
+            "port": 80
+        },
+        "browseexperienceservice_AMP": {
+            "hostname": ".com",
+            "port": 80
+        }
+    }
+}

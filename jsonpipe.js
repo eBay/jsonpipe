@@ -55,9 +55,7 @@ module.exports = {
 },{"./net/xhr":2,"./parsers/json-array":3,"./parsers/json-chunk":4,"./utils.js":5}],2:[function(_dereq_,module,exports){
 'use strict';
 
-var trim = ''.trim
-  ? function(s) { return s.trim(); }
-  : function(s) { return s.replace(/(^\s*|\s*$)/g, ''); };
+var utils = _dereq_('../utils.js');
 
 function parseHeader(str) {
     var lines = str.split(/\r?\n/);
@@ -73,7 +71,7 @@ function parseHeader(str) {
         line = lines[i];
         index = line.indexOf(':');
         field = line.slice(0, index).toLowerCase();
-        val = trim(line.slice(index + 1));
+        val = utils.trim(line.slice(index + 1));
         fields[field] = val;
     }
 
@@ -184,7 +182,7 @@ module.exports = {
     send: send
 };
 
-},{}],3:[function(_dereq_,module,exports){
+},{"../utils.js":5}],3:[function(_dereq_,module,exports){
 'use strict';
 
 var utils = _dereq_('../utils.js');
@@ -242,7 +240,8 @@ function Parser(options) {
 Parser.prototype.parse = function(text, finalChunk) {
     var chunk = text.substring(this.offset),
         curlyBraceCount = 0,
-        startIndex = -1;
+        startIndex = -1,
+        finalRemainingChunk;
 
     for (var currentIndex = 0; currentIndex < chunk.length; currentIndex++) {
         if (chunk[currentIndex] === '{') {
@@ -267,17 +266,25 @@ Parser.prototype.parse = function(text, finalChunk) {
             utils.parse(chunk.substring(startIndex, currentIndex + 1), this.success, this.error);
 
             // Reset the offset to the next pointer of currentIndex
-            this.offset = currentIndex + 1;
+            this.offset = this.offset + currentIndex + 1;
 
             // Rest startIndex
             startIndex = -1;
         }
     }
 
-    // if finalChunk and curlyBraceCount is not zero then incomplete JSON
-    // In that case error out the remaining chunk, so the caller can come to a closure
-    if (finalChunk && curlyBraceCount !== 0) {
-        utils.parse(chunk.substring(this.offset), this.success, this.error);
+    // if finalChunk, check the remaining chunk for incomplete or invalid JSON
+    if (finalChunk) {
+        finalRemainingChunk = text.substring(this.offset); // Get the final remaining chunk
+
+        // Perform 2 checks
+        // 1. Check if the curlyBraceCount is not zero, which mean incomplete JSON
+        // OR
+        // 2. Check if finalRemainingChunk is not closing square bracket, which means invalid JSON
+        if (curlyBraceCount !== 0 ||
+            utils.trim(finalRemainingChunk) !== ']') {
+            utils.parse(finalRemainingChunk, this.success, this.error);
+        }
     }
 };
 
@@ -341,6 +348,16 @@ function isFunction(fn) {
     return Object.prototype.toString.call(fn) === '[object Function]';
 }
 
+function trim(str) {
+    if (!str) {
+        return str;
+    }
+    if (str.trim) {
+        return str.trim();
+    }
+    return str.replace(/(^\s*|\s*$)/g, '');
+}
+
 // Do the eval trick, since JSON object not present
 function customParse(chunk) {
     if (!chunk || !/^[\{|\[].*[\}|\]]$/.test(chunk)) {
@@ -368,6 +385,7 @@ function parse(chunk, successCb, errorCb) {
 module.exports = {
     isString: isString,
     isFunction: isFunction,
+    trim: trim,
     parse: parse
 };
 
