@@ -1,4 +1,4 @@
-{
+window['complex-json-single'] = [{
     "lasso": {
         "plugins": [
             "i18n/optimizer/plugin",
@@ -31,18 +31,25 @@
     },
     "logging-inc": {
         "loglevel": {
-            "debug": "hhhh:*,xxx:*"
+            "url": "deb{ug",
+            "outputDir": "war}n",
+            "includeSlotNames": "tr{ansa}ction",
+            "fingerprintsEnabled": "err\"or",
+            "test1": "te/s\t",
+            "test2": "test\\"
         }
     },
     "cal-publishing-inc": {
         "appenders": {
             "console": {
                 "enabled": true,
-                "loglevel": {
-                    "debug": "hhhh:*,xxx:*",
-                    "warn": "none",
-                    "transaction": "none",
-                    "error": "*"
+                "splCharKeys": {
+                    "deb{ug": "hhhh:*,xxx:*",
+                    "war}n": "none",
+                    "tr{ansa}ction": "none",
+                    "err\"or": "*",
+                    "te/s\t": "test",
+                    "test\\": "test"
                 }
             }
         }
@@ -73,4 +80,4 @@
             "port": 80
         }
     }
-}
+}];

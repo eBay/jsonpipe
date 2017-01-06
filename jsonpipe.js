@@ -241,6 +241,7 @@ Parser.prototype.parse = function(text, finalChunk) {
     var chunk = text.substring(this.offset),
         curlyBraceCount = 0,
         startIndex = -1,
+        offsetPointer = 0,
         finalRemainingChunk;
 
     for (var currentIndex = 0; currentIndex < chunk.length; currentIndex++) {
@@ -265,24 +266,29 @@ Parser.prototype.parse = function(text, finalChunk) {
         if (curlyBraceCount === 0 && startIndex > -1) {
             utils.parse(chunk.substring(startIndex, currentIndex + 1), this.success, this.error);
 
-            // Reset the offset to the next pointer of currentIndex
-            this.offset = this.offset + currentIndex + 1;
+            // Set the offsetPointer to the next pointer of currentIndex
+            offsetPointer = currentIndex + 1;
 
             // Rest startIndex
             startIndex = -1;
         }
     }
 
+    if (offsetPointer > 0) {
+        // Increment offset state by offsetPointer
+        this.offset = this.offset + offsetPointer;
+    }
+
     // if finalChunk, check the remaining chunk for incomplete or invalid JSON
     if (finalChunk) {
         finalRemainingChunk = text.substring(this.offset); // Get the final remaining chunk
 
-        // Perform 2 checks
+        // If finalRemainingChunk is present, perform 2 checks
         // 1. Check if the curlyBraceCount is not zero, which mean incomplete JSON
         // OR
         // 2. Check if finalRemainingChunk is not closing square bracket, which means invalid JSON
-        if (curlyBraceCount !== 0 ||
-            utils.trim(finalRemainingChunk) !== ']') {
+        if (finalRemainingChunk &&
+            (curlyBraceCount !== 0 || utils.trim(finalRemainingChunk) !== ']')) {
             utils.parse(finalRemainingChunk, this.success, this.error);
         }
     }

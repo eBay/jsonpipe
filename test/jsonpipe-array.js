@@ -147,7 +147,7 @@
                 }
             );
 
-            it('should process a complex JSON Array response', function(done) {
+            it('should process a complex JSON Array response with single object', function(done) {
                 var xhr = jsonpipe.flow(testUrl, {
                     parserType: "json-array",
                     "success": function(data) {
@@ -156,10 +156,94 @@
                     }
                 });
 
-                xhr.respond(200, headers, '{"lasso":{"plugins":["i18n/optimizer/plugin","lasso-marko",{"plugin":"lasso-less","config":{"extensions":["less","css"],"lessConfig":{"strictMath":true}}},{"plugin":"lasso-autoprefixer","config":{"browsers":"> 1%"}}],"minifyInlineOnly":false,"bundlingEnabled":false,"cacheProfile":"development","fileWriter":{"url-prefix":"/static","outputDir":"static","includeSlotNames":true,"fingerprintsEnabled":false}},"logging-inc":{"loglevel":{"debug":"hhhh:*,xxx:*"}},"cal-publishing-inc":{"appenders":{"console":{"enabled":true,"loglevel":{"debug":"hhhh:*,xxx:*","warn":"none","transaction":"none","error":"*"}}}},"services":{"mockServiceResponse":false,"appMetadataSvc":{"hostname":".com"},"experienceservice":{"hostname":".com"},"browseexperienceservice":{"hostname":".com","port":80,"mockServiceResponse":false},"browseexperienceservicemoduleprovider":{"hostname":".com","port":80},"browserefineexperienceservice":{"hostname":".com","port":80},"browseexperienceservice_AMP":{"hostname":".com","port":80}}}');
+                xhr.respond(200, headers, JSON.stringify(window['complex-json-single']));
             });
 
-            it('should not call the error function for a valid JSON Array and small chunk size',
+            it('should process a complex JSON Array response with multiple objects', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            switch (chunkCount) { // eslint-disable-line default-case
+                                case 1:
+                                    assert.equal(data.lasso.fileWriter.outputDir, 'static');
+                                    break;
+                                case 2:
+                                    assert.equal(data.repository.type, 'git');
+                            }
+                            if (chunkCount === 2) {
+                                done();
+                            }
+                        }
+                    });
+
+                xhr.respond(200, headers, JSON.stringify(window['complex-json-multiple']));
+            });
+
+            it('should process JSON Array response with special characters ({, }, ", \, /) in keys and values', function(done) { // eslint-disable-line max-len
+                var xhr = jsonpipe.flow(testUrl, {
+                    parserType: "json-array",
+                    "success": function(data) {
+                        // Asserting the keys
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['deb{ug'], 'hhhh:*,xxx:*'); // eslint-disable-line max-len
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['war}n'], 'none');
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['tr{ansa}ction'], 'none');
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['err\"or'], '*');
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['te/s\t'], 'test');
+                        assert.equal(data['cal-publishing-inc'].appenders.console.splCharKeys['test\\'], 'test');
+
+                        // Asserting the values
+                        assert.equal(data['logging-inc'].loglevel.url, 'deb{ug');
+                        assert.equal(data['logging-inc'].loglevel.outputDir, 'war}n');
+                        assert.equal(data['logging-inc'].loglevel.includeSlotNames, 'tr{ansa}ction');
+                        assert.equal(data['logging-inc'].loglevel.fingerprintsEnabled, 'err\"or');
+                        assert.equal(data['logging-inc'].loglevel.test1, 'te/s\t');
+                        assert.equal(data['logging-inc'].loglevel.test2, 'test\\');
+                        done();
+                    }
+                });
+
+                xhr.respond(200, headers, JSON.stringify(window['complex-json-single']));
+            });
+
+            it('should NOT call the error function for an empty JSON Array',
+                function(done) {
+                    var isErrorFnCalled = false,
+                        xhr = jsonpipe.flow(testUrl, {
+                            parserType: "json-array",
+                            "error": function() {
+                                isErrorFnCalled = true;
+                            },
+                            "complete": function() {
+                                assert.isFalse(isErrorFnCalled);
+                                done();
+                            }
+                        });
+
+                    xhr.respond(200, headers, JSON.stringify([]));
+                }
+            );
+
+            it('should NOT call the error function for an empty JSON Object',
+                function(done) {
+                    var isErrorFnCalled = false,
+                        xhr = jsonpipe.flow(testUrl, {
+                            parserType: "json-array",
+                            "error": function() {
+                                isErrorFnCalled = true;
+                            },
+                            "complete": function() {
+                                assert.isFalse(isErrorFnCalled);
+                                done();
+                            }
+                        });
+
+                    xhr.respond(200, headers, JSON.stringify({}));
+                }
+            );
+
+            it('should NOT call the error function for a valid JSON Array and small chunk size',
                 function(done) {
                     var isErrorFnCalled = false,
                         xhr = jsonpipe.flow(testUrl, {
@@ -182,7 +266,7 @@
                 }
             );
 
-            it('should not call the error function for a valid JSON Array and large chunk size',
+            it('should NOT call the error function for a valid JSON Array and large chunk size',
                 function(done) {
                     var isErrorFnCalled = false,
                         xhr = jsonpipe.flow(testUrl, {
@@ -191,7 +275,7 @@
                                 isErrorFnCalled = true;
                             },
                             "complete": function() {
-                                //assert.isFalse(isErrorFnCalled);
+                                assert.isFalse(isErrorFnCalled);
                                 done();
                             }
                         });
@@ -205,9 +289,6 @@
                 }
             );
         });
-        // complex object
-        // key with special characters ({, }, ", /)
-        // value with special characters
         // Array with trailing comma
     });
 }());
