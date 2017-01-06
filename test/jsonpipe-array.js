@@ -147,6 +147,64 @@
                 }
             );
 
+            it('should process JSON objects even if they are NOT in an Array (i.e. encapsulated by square brackers [])',
+                function(done) {
+                    var chunkCount = 0,
+                        xhr = jsonpipe.flow(testUrl, {
+                            parserType: "json-array",
+                            "success": function(data) {
+                                chunkCount++;
+                                assert.equal(data.id, chunkCount);
+                                if (chunkCount === 5) {
+                                    done();
+                                }
+                            }
+                        });
+
+                    // Set chunkSize
+                    xhr.chunkSize = 11;
+
+                    xhr.respond(200, headers, '{ "id": 1 }, { "id": 2 }, { "id": 3 }, { "id": 4 }, { "id": 5 }');
+                }
+            );
+
+            it('should process JSON objects even if they are NOT in an Array ' +
+                '(i.e. encapsulated by square brackers []) and are NOT delimitted by any character', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                            if (chunkCount === 5) {
+                                done();
+                            }
+                        }
+                    });
+
+                // Set chunkSize
+                xhr.chunkSize = 200;
+
+                xhr.respond(200, headers, '{ "id": 1 }{ "id": 2 }{ "id": 3 }{ "id": 4 }{ "id": 5 }');
+            });
+
+            it('should process JSON objects even if they are NOT in an Array ' +
+                '(i.e. encapsulated by square brackers []) and are delimitted by any character', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                            if (chunkCount === 5) {
+                                done();
+                            }
+                        }
+                    });
+
+                xhr.respond(200, headers, '{ "id": 1 }\n\n{ "id": 2 }\r\n{ "id": 3 }nnn{ "id": 4 }@#${ "id": 5 }');
+            });
+
             it('should process a complex JSON Array response with single object', function(done) {
                 var xhr = jsonpipe.flow(testUrl, {
                     parserType: "json-array",
@@ -289,7 +347,131 @@
                 }
             );
         });
-        // Array with trailing comma
+
+        describe('verify json-array error scenarios', function() {
+            var fakexhr;
+
+            before(function() {
+                fakexhr = sinon.useFakeXMLHttpRequest();
+            });
+
+            after(function() {
+                fakexhr.restore();
+            });
+
+            it('should call error function on an invalid object chunk in a JSON Array', function(done) {
+                var xhr = jsonpipe.flow(testUrl, {
+                    parserType: "json-array",
+                    "error": function(msg) {
+                        assert.equal(msg, 'parsererror');
+                        done();
+                    }
+                });
+
+                xhr.respond(200, headers, '[{id:}]');
+            });
+
+            it('should call success function until it receives valid JSON object chunks and ' +
+                'error function on the remaining invalid JSON object - small chunk size', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                        },
+                        "error": function(msg) {
+                            assert.equal(msg, 'parsererror');
+                            done();
+                        }
+                    });
+
+                // Set chunkSize
+                xhr.chunkSize = 5;
+
+                xhr.respond(200, headers, '[{ "id": 1 }, { "id": 2 }, { "id": 3 }, { "id": 4 }, { "id": }]');
+            });
+
+            it('should call success function until it receives valid JSON chunks and ' +
+                'error function on the remaining invalid JSON object - large chunk size', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                        },
+                        "error": function(msg) {
+                            assert.equal(msg, 'parsererror');
+                            done();
+                        }
+                    });
+
+                // Set chunkSize
+                xhr.chunkSize = 200;
+
+                xhr.respond(200, headers, '[{ "id": 1 }, { "id": 2 }, { "id": 3 }, { "id": 4 }, { "id": }]');
+            });
+
+            it('should call success function until it receives valid JSON chunks and ' +
+                'error function on the trailing comma', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                        },
+                        "error": function(msg) {
+                            assert.equal(msg, 'parsererror');
+                            done();
+                        }
+                    });
+
+                // Set chunkSize
+                xhr.chunkSize = 12;
+
+                xhr.respond(200, headers, '[{ "id": 1 }, { "id": 2 }, { "id": 3 }, { "id": 4 },]');
+            });
+
+            it('should call error function if one object in the array is not properly encapsulated ({}) thus ' +
+                'making the remaining JSON Array invalid and ' +
+                'success function should never be called after that', function(done) {
+                var isSuccessFnCalled = false,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function() {
+                            isSuccessFnCalled = true;
+                        },
+                        "error": function(msg) {
+                            assert.equal(msg, 'parsererror');
+                        },
+                        "complete": function() {
+                            assert.isFalse(isSuccessFnCalled);
+                            done();
+                        }
+                    });
+
+                xhr.respond(200, headers, '[{ "id": , { "id": 2 }, { "id": 3 }, { "id": 4 }]');
+            });
+
+            it('should call error function on an invalid JSON object chunk which is encapsulated ({}) and ' +
+                'success function on remaining valid chunks', function(done) {
+                var chunkCount = 0,
+                    xhr = jsonpipe.flow(testUrl, {
+                        parserType: "json-array",
+                        "success": function(data) {
+                            chunkCount++;
+                            assert.equal(data.id, chunkCount);
+                        },
+                        "error": function(msg) {
+                            assert.equal(msg, 'parsererror');
+                            done();
+                        }
+                    });
+
+                xhr.respond(200, headers, '[{ "id": 1}, { "id": }, { "id": 2 }, { "id": 3 }]');
+            });
+        });
     });
 }());
-
