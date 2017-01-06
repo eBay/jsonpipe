@@ -5,8 +5,8 @@ jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is sim
 ##Prerequisites
 To use jsonpipe, the server should 
 
-1. Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
-2. Every valid JSON object should be separated by the delimiter `\n\n` (double new line character, it is also  [configurable](https://github.com/eBay/jsonpipe#delimiter)). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
+* Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
+* Every valid JSON object should be separated by the delimiter `\n\n` (double new line character, it is also  [configurable](https://github.com/eBay/jsonpipe#delimiter)). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
 ```JSON
     {
         "id": 12345,
@@ -20,6 +20,22 @@ To use jsonpipe, the server should
         "price": "$299.99"
     }
 ```
+* If the server wants to send a valid JSON [MIME](http://www.ietf.org/rfc/rfc4627.txt) type (`application/json`) in response header, set the [`parseType`](https://github.com/eBay/jsonpipe#parsetype) option as `json-array` and the response should be a JSON Array as shown below
+```JSON
+    [
+        {
+            "id": 12345,
+            "title": "Bruce Wayne",
+            "price": "$199.99"
+        },
+        {
+            "id": 67890,
+            "title": "Bane",
+            "price": "$299.99"
+        }
+    ]
+```
+When using a delimiter based response, even though every chunk (before & after a delimiter) is a valid JSON object, the overall server response is not a valid JSON response. This means that the server cannot respond with the MIME type `application/json`. Some services may have concern over this. To solve this jsonpipe has a [json-array](https://github.com/eBay/jsonpipe#delimiter) parse type option.
 
 ##Usage
 [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/jsonpipe.js) is bundled as a [browserify CommonJS](http://dontkry.com/posts/code/browserify-and-the-universal-module-definition.html) module, so it can be used in the same node.js `require` style. It has only one API named `flow` exposed 
@@ -36,6 +52,7 @@ To use jsonpipe, the server should
      */
     jsonpipe.flow('http://api.com/items?q=batman', {
     	"delimiter": "", // String. The delimiter separating valid JSON objects; default is "\n\n"
+        "parseType": "json-chunk", // String. Optional, the type of parsing to be used. Values can be json-chunk | json-array. Default is "json-chunk",
         "onHeaders": function(statusText, headers) {
             // Do something with the headers and the statusText.
         }
@@ -63,6 +80,11 @@ To use jsonpipe, the server should
 Type: `String`
 
 The delimiter separating valid JSON objects in the chunked response; default is `\n\n`
+
+####parseType
+Type: `String`
+
+The type of parsing to be used. Values can be `json-chunk` or `json-array`. The default is `json-chunk`, which uses the delimiter based response. Please refer the [`json-array`]() section to see how it works. 
 
 ####onHeaders
 Type: `Function`
@@ -103,6 +125,8 @@ An object of additional header key/value pairs to send along with request.
 Type: `String`
 
 A serialized string to be sent in the request body for a POST/PUT request
+
+###json-array
 
 ##Testing
 The entire test suite for the jsonpipe API is available in the main test file  [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/test/jsonpipe.js). The [mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs) wrapper is used as the testing framework and [chai](http://chaijs.com/api/assert/) for assertion. To run the tests - clone/fork the [repo](https://github.com/eBay/jsonpipe), 
