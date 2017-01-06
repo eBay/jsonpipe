@@ -6,7 +6,7 @@ jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is sim
 To use jsonpipe, the server should 
 
 * Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
-* Every valid JSON object should be separated by the delimiter `\n\n` (double new line character, it is also  [configurable](https://github.com/eBay/jsonpipe#delimiter)). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
+* Every valid JSON object should be separated by the delimiter `\n\n` (double new line character, it is also  [configurable](#delimiter)). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
 ```JSON
     {
         "id": 12345,
@@ -20,7 +20,7 @@ To use jsonpipe, the server should
         "price": "$299.99"
     }
 ```
-* If the server wants to send a valid JSON [MIME](http://www.ietf.org/rfc/rfc4627.txt) type (`application/json`) in response header, set the [`parseType`](https://github.com/eBay/jsonpipe#parsetype) option as `json-array` and the response should be a JSON Array as shown below
+* If the server wants to send a valid JSON [MIME](http://www.ietf.org/rfc/rfc4627.txt) type (`application/json`) in response header, set the [`parseType`](#parsetype) option as `json-array` and the response should be a JSON Array as shown below
 ```JSON
     [
         {
@@ -35,7 +35,7 @@ To use jsonpipe, the server should
         }
     ]
 ```
-When using a delimiter based response, even though every chunk (before & after a delimiter) is a valid JSON object, the overall server response is not a valid JSON response. This means that the server cannot respond with the MIME type `application/json`. Some services may have concern over this. To solve this jsonpipe has a [json-array](https://github.com/eBay/jsonpipe#delimiter) parse type option.
+When using a delimiter based response, even though every chunk (before & after a delimiter) is a valid JSON object, the overall server response is not a valid JSON response. This means that the server cannot respond with the MIME type `application/json`. Some services may have concern over this. To solve this jsonpipe has a [json-array](##json-array) parse type option.
 
 ##Usage
 [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/jsonpipe.js) is bundled as a [browserify CommonJS](http://dontkry.com/posts/code/browserify-and-the-universal-module-definition.html) module, so it can be used in the same node.js `require` style. It has only one API named `flow` exposed 
@@ -84,7 +84,7 @@ The delimiter separating valid JSON objects in the chunked response; default is 
 ####parseType
 Type: `String`
 
-The type of parsing to be used. Values can be `json-chunk` or `json-array`. The default is `json-chunk`, which uses the delimiter based response. Please refer the [`json-array`]() section to see how it works. 
+The type of parsing to be used. Values can be `json-chunk` or `json-array`. The default is `json-chunk`, which uses the delimiter based response. Please refer the [`json-array`](#json-array) section to see how it works. 
 
 ####onHeaders
 Type: `Function`
