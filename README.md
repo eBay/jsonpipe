@@ -1,8 +1,8 @@
-#jsonpipe [![Build Status](https://travis-ci.org/eBay/jsonpipe.svg?branch=master)](https://travis-ci.org/eBay/jsonpipe) [![Coverage Status](https://coveralls.io/repos/eBay/jsonpipe/badge.svg?branch=master&service=github)](https://coveralls.io/github/eBay/jsonpipe?branch=master) [![npm version](https://badge.fury.io/js/jsonpipe.svg)](http://badge.fury.io/js/jsonpipe) [![Dependency Status](https://david-dm.org/ebay/jsonpipe.svg)](https://david-dm.org/ebay/jsonpipe)
+# jsonpipe [![Build Status](https://travis-ci.org/eBay/jsonpipe.svg?branch=master)](https://travis-ci.org/eBay/jsonpipe) [![Coverage Status](https://coveralls.io/repos/eBay/jsonpipe/badge.svg?branch=master&service=github)](https://coveralls.io/github/eBay/jsonpipe?branch=master) [![npm version](https://badge.fury.io/js/jsonpipe.svg)](http://badge.fury.io/js/jsonpipe) [![Dependency Status](https://david-dm.org/ebay/jsonpipe.svg)](https://david-dm.org/ebay/jsonpipe)
 
 jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is similar to [jQuery ajax](http://api.jquery.com/jquery.ajax/), but for JSON responses transmitted through [chunked encoding](http://en.wikipedia.org/wiki/Chunked_transfer_encoding). It is a standalone utility with no dependencies. 
 
-##Prerequisites
+## Prerequisites
 To use jsonpipe, the server should 
 
 1. Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
@@ -21,7 +21,7 @@ To use jsonpipe, the server should
     }
 ```
 
-##Usage
+## Usage
 [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/jsonpipe.js) is bundled as a [browserify CommonJS](http://dontkry.com/posts/code/browserify-and-the-universal-module-definition.html) module, so it can be used in the same node.js `require` style. It has only one API named `flow` exposed 
 ```HTML
     <script src="jsonpipe.js"></script>
@@ -58,65 +58,65 @@ To use jsonpipe, the server should
     });
 ```
 
-###options
-####delimiter
+### options
+#### delimiter
 Type: `String`
 
 The delimiter separating valid JSON objects in the chunked response; default is `\n\n`
 
-####onHeaders
+#### onHeaders
 Type: `Function`
 
 The callback function to be called when headers are received. The function gets passed the the `XMLHttpRequest` object's  `statusText` and the headers.
 
-####success
+#### success
 Type: `Function`
 
 The callback function to be called on every valid JSON chunk. The function gets passed the parsed JSON object. 
 
-####error
+#### error
 Type: `Function`
 
 The callback function to be called on error scenarios. The function gets passed with an error message, reasoning the failure. There can be many reasons for errors, the most common one being the JSON parse error. It that case the error message would be `parsererror`. For errors associated with the HTTP request the message would be `XMLHttpRequest` object's  `statusText`. 
 
-####complete
+#### complete
 Type: `Function`
 
 The callback function to be called when the request finishes (after success and error callbacks are executed). The function gets passed the `XMLHttpRequest` object's  `statusText`.
 
-####timeout
+#### timeout
 Type: `Number`
 
 Timeout in milliseconds for the HTTP request. If a call exceeds the timeout, the call is aborted and error function is called.
 
-####method
+#### method
 Type: `String`
 
 The HTTP method/type of request to make (e.g. `POST`, `DELETE`, `PUT`); default is `GET`.
 
-####headers
+#### headers
 Type: `Object`
 
 An object of additional header key/value pairs to send along with request.
 
-####data
+#### data
 Type: `String`
 
 A serialized string to be sent in the request body for a POST/PUT request
 
-##Testing
+## Testing
 The entire test suite for the jsonpipe API is available in the main test file  [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/test/jsonpipe.js). The [mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs) wrapper is used as the testing framework and [chai](http://chaijs.com/api/assert/) for assertion. To run the tests - clone/fork the [repo](https://github.com/eBay/jsonpipe), 
 install the package `$ npm install` and run
 
     $ npm test
 
-##Issues
+## Issues
 Have a bug or a feature request? [Please open a new issue](https://github.com/eBay/jsonpipe/issues)
 
-##Author(s)
+## Author(s)
 [Senthil Padmanabhan](http://senthilp.com/)
 
-##License 
+## License 
 Copyright (c) 2015 eBay Inc.
 
 Released under the MIT License
