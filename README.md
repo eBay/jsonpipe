@@ -2,6 +2,9 @@
 
 jsonpipe is a lightweight AJAX client for chunked JSON responses. The API is similar to [jQuery ajax](http://api.jquery.com/jquery.ajax/), but for JSON responses transmitted through [chunked encoding](http://en.wikipedia.org/wiki/Chunked_transfer_encoding). It is a standalone utility with no dependencies. 
 
+## Browser Support
+IE8 and above. All versions of Chrome, Safari, Firefox, Opera and Android browsers.
+
 ## Prerequisites
 To use jsonpipe, the server should 
 
