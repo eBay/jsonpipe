@@ -126,8 +126,6 @@ Type: `String`
 
 A serialized string to be sent in the request body for a POST/PUT request
 
-### json-array
-
 ## Testing
 The entire test suite for the jsonpipe API is available in the main test file  [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/test/jsonpipe.js). The [mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs) wrapper is used as the testing framework and [chai](http://chaijs.com/api/assert/) for assertion. To run the tests - clone/fork the [repo](https://github.com/eBay/jsonpipe), 
 install the package `$ npm install` and run
