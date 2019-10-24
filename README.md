@@ -8,7 +8,7 @@ IE8 and above. All versions of Chrome, Safari, Firefox, Opera and Android browse
 ## Prerequisites
 To use jsonpipe, the server should 
 
-1. Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header
+1. Emit the [Transfer-Encoding: chunked](http://en.wikipedia.org/wiki/Chunked_transfer_encoding) HTTP header (only if HTTP/1.* is used)
 2. Every valid JSON object should be separated by the delimiter `\n\n` (double new line character, it is also  [configurable](https://github.com/eBay/jsonpipe#delimiter)). Instead of processing the JSON on every chunk, jsonpipe waits for the delimiter and then processes. The server should always ensure there is a valid JSON object between the delimiter. The reasoning behind this is, even when a chunk has an invalid JSON (which is very likely), the JSON processing would not break and wait for the next delimiter. A sample JSON response shown below 
 ```JSON
     {
