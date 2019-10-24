@@ -1,6 +1,6 @@
 {
 	"name": "jsonpipe",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"main": "jsonpipe.js",
 	"keywords": [
 		"jsonpipe",
