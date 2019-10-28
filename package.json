@@ -3,6 +3,7 @@
   "version": "2.1.2",
   "description": "AJAX utility for consuming chunked JSON responses",
   "main": "./lib/jsonpipe.js",
+  "typings": "types.d.ts",
   "scripts": {
     "test": "gulp test",
     "coveralls": "gulp test-cov && gulp report-coveralls && rm -rf coverage && rm -rf lib-cov"

@@ -39,6 +39,9 @@ To use jsonpipe, the server should
      */
     jsonpipe.flow('http://api.com/items?q=batman', {
     	"delimiter": "", // String. The delimiter separating valid JSON objects; default is "\n\n"
+        "onUploadProgress", function(progressEvent) {
+            // Do something with browser's upload progress event
+        },
         "onHeaders": function(statusText, headers) {
             // Do something with the headers and the statusText.
         }
@@ -56,7 +59,8 @@ To use jsonpipe, the server should
         "headers": { // Object. An object of additional header key/value pairs to send along with request
             "X-Requested-With": "XMLHttpRequest"
         },
-        "data": "", // String. A serialized string to be sent in a POST/PUT request,
+        "data": "", // String | FormData | File | Blob. What to be sent in the request body.
+        "disableContentType": false, // By default jsonpipe will set `Content-Type` to "application/x-www-form-urlencoded", you can set `disableContentType` to `true` to skip this behavior. Must set `true` if your `data` is not a string.
         "withCredentials": true // Boolean. Send cookies when making cross-origin requests; default is true
     });
 ```
@@ -66,6 +70,10 @@ To use jsonpipe, the server should
 Type: `String`
 
 The delimiter separating valid JSON objects in the chunked response; default is `\n\n`
+
+### onUploadProgress
+Type: `Function`
+The callback function to be called when browser's native upload progress event triggered.
 
 #### onHeaders
 Type: `Function`
@@ -103,9 +111,14 @@ Type: `Object`
 An object of additional header key/value pairs to send along with request.
 
 #### data
-Type: `String`
+Type: `String` | `FormData` | `File` | `Blob`
 
-A serialized string to be sent in the request body for a POST/PUT request
+What to be sent in the request body. Please note if you would like to send anything rather than `String`, the option `disableContentType` must set to `true`.
+
+#### disableContentType
+Type `Boolean`
+
+By default jsonpipe will set `Content-Type` to "application/x-www-form-urlencoded", you can set `disableContentType` to `true` to skip this behavior. Must set `true` if your `data` is not a string.
 
 ## Testing
 The entire test suite for the jsonpipe API is available in the main test file  [jsonpipe.js](https://github.com/eBay/jsonpipe/blob/master/test/jsonpipe.js). The [mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs) wrapper is used as the testing framework and [chai](http://chaijs.com/api/assert/) for assertion. To run the tests - clone/fork the [repo](https://github.com/eBay/jsonpipe), 
