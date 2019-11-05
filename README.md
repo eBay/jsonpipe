@@ -39,29 +39,29 @@ To use jsonpipe, the server should
      */
     jsonpipe.flow('http://api.com/items?q=batman', {
     	"delimiter": "", // String. The delimiter separating valid JSON objects; default is "\n\n"
-        "onUploadProgress": function(progressEvent) {
-            // Do something with browser's upload progress event
-        },
-        "onHeaders": function(statusText, headers) {
-            // Do something with the headers and the statusText.
-        },
-        "success": function(data) {
-            // Do something with this JSON chunk
-        },
-        "error": function(errorMsg) {
-            // Something wrong happened, check the error message
-        },
-        "complete": function(statusText) {
-            // Called after success/error, with the XHR status text
-        },
-        "timeout": 3000, // Number. Set a timeout (in milliseconds) for the request
-        "method": "GET", // String. The type of request to make (e.g. "POST", "GET", "PUT"); default is "GET"
-        "headers": { // Object. An object of additional header key/value pairs to send along with request
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        "data": "", // String | FormData | File | Blob. What to be sent in the request body.
-        "disableContentType": false, // By default jsonpipe will set `Content-Type` to "application/x-www-form-urlencoded", you can set `disableContentType` to `true` to skip this behavior. Must set `true` if your `data` is not a string.
-        "withCredentials": true // Boolean. Send cookies when making cross-origin requests; default is true
+      "onUploadProgress": function(progressEvent) {
+          // Do something with browser's upload progress event
+      },
+      "onHeaders": function(statusText, headers) {
+          // Do something with the headers and the statusText.
+      },
+      "success": function(data) {
+          // Do something with this JSON chunk
+      },
+      "error": function(errorMsg) {
+          // Something wrong happened, check the error message
+      },
+      "complete": function(statusText) {
+          // Called after success/error, with the XHR status text
+      },
+      "timeout": 3000, // Number. Set a timeout (in milliseconds) for the request
+      "method": "GET", // String. The type of request to make (e.g. "POST", "GET", "PUT"); default is "GET"
+      "headers": { // Object. An object of additional header key/value pairs to send along with request
+          "X-Requested-With": "XMLHttpRequest"
+      },
+      "data": "", // String | FormData | File | Blob. What to be sent in the request body.
+      "disableContentType": false, // By default jsonpipe will set `Content-Type` to "application/x-www-form-urlencoded", you can set `disableContentType` to `true` to skip this behavior. Must set `true` if your `data` is not a string.
+      "withCredentials": true // Boolean. Send cookies when making cross-origin requests; default is true
     });
 ```
 
