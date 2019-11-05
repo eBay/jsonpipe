@@ -39,12 +39,12 @@ To use jsonpipe, the server should
      */
     jsonpipe.flow('http://api.com/items?q=batman', {
     	"delimiter": "", // String. The delimiter separating valid JSON objects; default is "\n\n"
-        "onUploadProgress", function(progressEvent) {
+        "onUploadProgress": function(progressEvent) {
             // Do something with browser's upload progress event
         },
         "onHeaders": function(statusText, headers) {
             // Do something with the headers and the statusText.
-        }
+        },
         "success": function(data) {
             // Do something with this JSON chunk
         },
