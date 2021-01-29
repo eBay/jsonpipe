@@ -11,7 +11,7 @@ var xhr = _dereq_('./net/xhr'),
      * @return {XMLHttpRequest} The XMLHttpRequest object for this request.
      * @method ajax
      */
-    ajax = function(url, options) {
+    ajax = function (url, options) {
         // Do all prerequisite checks
         if (!url) {
             return undefined;
@@ -47,20 +47,26 @@ module.exports = {
 'use strict';
 
 var trim = ''.trim
-  ? function(s) { return s.trim(); }
-  : function(s) { return s.replace(/(^\s*|\s*$)/g, ''); };
+    ? function (s) {
+        return s.trim();
+    }
+    : function (s) {
+        return s.replace(/(^\s*|\s*$)/g, '');
+    };
 
 function parseHeader(str) {
     var lines = str.split(/\r?\n/);
     var fields = {};
-    var index;
-    var line;
-    var field;
-    var val;
+    let index;
+    let line;
+    let field;
+    let val;
 
     lines.pop(); // trailing CRLF
 
-    for (var i = 0, len = lines.length; i < len; ++i) {
+    let i = 0;
+    var len = lines.length;
+    for (; i < len; ++i) {
         line = lines[i];
         index = line.indexOf(':');
         field = line.slice(0, index).toLowerCase();
@@ -84,20 +90,28 @@ function send(url, options) {
             LOADING: 3,
             DONE: 4
         },
-        noop = function() {},
+        noop = function () {
+        },
         method = (options.method || '').toUpperCase(),
         headers = options.headers,
         onChunk = options.onChunk || noop,
         onHeaders = options.onHeaders || noop,
         errorFn = options.error || noop,
         completeFn = options.complete || noop,
-        addContentHeader = method === 'POST',
+        disableContentType = options.disableContentType || false,
+        onUploadProgress = options.onUploadProgress;
+    let addContentHeader = method === 'POST',
         timer;
+
+    // Not all browsers support upload events
+    if (typeof onUploadProgress === 'function' && xhr.upload) {
+        xhr.upload.addEventListener('progress', onUploadProgress);
+    }
 
     xhr.open(method || 'GET', url, true);
 
     // Attach onreadystatechange
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === state.HEADERS_RECEIVED) {
             onHeaders(xhr.statusText, parseHeader(xhr.getAllResponseHeaders()));
         } else if (xhr.readyState === state.LOADING) {
@@ -120,20 +134,20 @@ function send(url, options) {
 
     // Add headers
     if (headers) {
-        for (var key in headers) { // eslint-disable-line guard-for-in
+        for (let key in headers) { // eslint-disable-line guard-for-in
             xhr.setRequestHeader(key, headers[key]);
             if (key.toLowerCase() === 'content-type') {
                 addContentHeader = false;
             }
         }
     }
-    if (addContentHeader) {
+    if (!disableContentType && addContentHeader) {
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
     // Add timeout
     if (options.timeout) {
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
             xhr.abort();
             clearTimeout(timer);
         }, options.timeout);
@@ -158,7 +172,7 @@ module.exports = {
 },{}],3:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils.js');
+        var utils = _dereq_('../utils.js');
 
 function Parser(options) {
     this.offset = 0;
@@ -167,36 +181,36 @@ function Parser(options) {
     this.error = options.error;
 }
 
-Parser.prototype.parse = function(text, finalChunk) {
-    var chunk = text.substring(this.offset),
-        start = 0,
-        finish = chunk.indexOf(this.token, start),
-        subChunk;
+        Parser.prototype.parse = function (text, finalChunk) {
+            let chunk = text.substring(this.offset),
+                start = 0,
+                finish = chunk.indexOf(this.token, start),
+                subChunk;
 
-    if (finish === 0) { // The delimiter is at the beginning so move the start
-        start = this.token.length;
-    }
+            if (finish === 0) { // The delimiter is at the beginning so move the start
+                start = this.token.length;
+            }
 
-    // Re-assign finish to the next token
-    finish = chunk.indexOf(this.token, start);
+            // Re-assign finish to the next token
+            finish = chunk.indexOf(this.token, start);
 
-    while (finish > -1) {
-        subChunk = chunk.substring(start, finish);
-        if (subChunk) {
-            utils.parse(subChunk, this.success, this.error);
-        }
-        start = finish + this.token.length; // move the start
-        finish = chunk.indexOf(this.token, start); // Re-assign finish to the next token
-    }
-    this.offset += start; // move the offset
+            while (finish > -1) {
+                subChunk = chunk.substring(start, finish);
+                if (subChunk) {
+                    utils.parse(subChunk, this.success, this.error);
+                }
+                start = finish + this.token.length; // move the start
+                finish = chunk.indexOf(this.token, start); // Re-assign finish to the next token
+            }
+            this.offset += start; // move the offset
 
-    // Get the remaning chunk
-    chunk = text.substring(this.offset);
-    // If final chunk and still unprocessed chunk and no delimiter, then execute the full chunk
-    if (finalChunk && chunk && finish === -1) {
-        utils.parse(chunk, this.success, this.error);
-    }
-};
+            // Get the remaining chunk
+            chunk = text.substring(this.offset);
+            // If final chunk and still unprocessed chunk and no delimiter, then execute the full chunk
+            if (finalChunk && chunk && finish === -1) {
+                utils.parse(chunk, this.success, this.error);
+            }
+        };
 
 module.exports = Parser;
 
@@ -214,14 +228,14 @@ function isFunction(fn) {
 
 // Do the eval trick, since JSON object not present
 function customParse(chunk) {
-    if (!chunk || !/^[\{|\[].*[\}|\]]$/.test(chunk)) {
+    if (!chunk || !/^[{|\[].*[}|\]]$/.test(chunk)) {
         throw new Error('parseerror');
     }
     return eval('(' + chunk + ')'); // eslint-disable-line no-eval
 }
 
 function parse(chunk, successCb, errorCb) {
-    var jsonObj;
+    let jsonObj;
     try {
         jsonObj = typeof JSON !== 'undefined' ? JSON.parse(chunk) : customParse(chunk);
     } catch (ex) {
