@@ -1,7 +1,7 @@
 'use strict';
 
 require('gulp-clean');
-const gulp = require('gulp'),
+var gulp = require('gulp'),
     browserify = require('gulp-browserify'),
     replace = require('gulp-replace'),
     mochaPhantomJS = require('gulp-mocha-phantomjs'),
@@ -37,7 +37,7 @@ gulp.task('instrument', gulp.series('build'), function () {
 
 // Add the test coverage task task
 gulp.task('test-cov', gulp.series('instrument'), function () {
-    const htmlFile = 'test/jsonpipe.html',
+    var htmlFile = 'test/jsonpipe.html',
         replaceStrs = ['../jsonpipe.js', '../lib-cov/jsonpipe.js'],
         coverageJSON = 'coverage/coverage.json';
 

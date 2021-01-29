@@ -2,7 +2,7 @@
 /* eslint no-param-reassign:0 */
 'use strict';
 
-const xhr = _dereq_('./net/xhr'),
+var xhr = _dereq_('./net/xhr'),
     utils = _dereq_('./utils.js'),
     Parser = _dereq_('./parsers/json-chunk'),
     /**
@@ -31,7 +31,7 @@ const xhr = _dereq_('./net/xhr'),
         }
 
         // Init the parser
-        const parser = new Parser(options);
+        var parser = new Parser(options);
 
         // Assign onChunk to options with parse function, binded to the parser object
         options.onChunk = parser.parse.bind(parser);
@@ -46,17 +46,17 @@ module.exports = {
 },{"./net/xhr":2,"./parsers/json-chunk":3,"./utils.js":4}],2:[function(_dereq_,module,exports){
 'use strict';
 
-        const trim = ''.trim
-            ? function (s) {
-                return s.trim();
-            }
-            : function (s) {
-                return s.replace(/(^\s*|\s*$)/g, '');
-            };
+var trim = ''.trim
+    ? function (s) {
+        return s.trim();
+    }
+    : function (s) {
+        return s.replace(/(^\s*|\s*$)/g, '');
+    };
 
 function parseHeader(str) {
-    const lines = str.split(/\r?\n/);
-    const fields = {};
+    var lines = str.split(/\r?\n/);
+    var fields = {};
     let index;
     let line;
     let field;
@@ -65,7 +65,7 @@ function parseHeader(str) {
     lines.pop(); // trailing CRLF
 
     let i = 0;
-    const len = lines.length;
+    var len = lines.length;
     for (; i < len; ++i) {
         line = lines[i];
         index = line.indexOf(':');
@@ -82,7 +82,7 @@ function send(url, options) {
         return undefined;
     }
 
-    const xhr = new XMLHttpRequest(),
+    var xhr = new XMLHttpRequest(),
         state = {
             UNSENT: 0,
             OPENED: 1,
@@ -172,7 +172,7 @@ module.exports = {
 },{}],3:[function(_dereq_,module,exports){
 'use strict';
 
-        const utils = _dereq_('../utils.js');
+        var utils = _dereq_('../utils.js');
 
 function Parser(options) {
     this.offset = 0;
@@ -194,23 +194,23 @@ function Parser(options) {
             // Re-assign finish to the next token
             finish = chunk.indexOf(this.token, start);
 
-    while (finish > -1) {
-        subChunk = chunk.substring(start, finish);
-        if (subChunk) {
-            utils.parse(subChunk, this.success, this.error);
-        }
-        start = finish + this.token.length; // move the start
-        finish = chunk.indexOf(this.token, start); // Re-assign finish to the next token
-    }
-    this.offset += start; // move the offset
+            while (finish > -1) {
+                subChunk = chunk.substring(start, finish);
+                if (subChunk) {
+                    utils.parse(subChunk, this.success, this.error);
+                }
+                start = finish + this.token.length; // move the start
+                finish = chunk.indexOf(this.token, start); // Re-assign finish to the next token
+            }
+            this.offset += start; // move the offset
 
             // Get the remaining chunk
-    chunk = text.substring(this.offset);
-    // If final chunk and still unprocessed chunk and no delimiter, then execute the full chunk
-    if (finalChunk && chunk && finish === -1) {
-        utils.parse(chunk, this.success, this.error);
-    }
-};
+            chunk = text.substring(this.offset);
+            // If final chunk and still unprocessed chunk and no delimiter, then execute the full chunk
+            if (finalChunk && chunk && finish === -1) {
+                utils.parse(chunk, this.success, this.error);
+            }
+        };
 
 module.exports = Parser;
 
